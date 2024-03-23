@@ -18,15 +18,15 @@ class Recipe
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(targetEntity: Stack::class, mappedBy: 'recipe', orphanRemoval: true)]
-    private Collection $ingredients;
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Stack $Dish = null;
-
     #[ORM\Column]
     private ?int $throughput = null;
+
+    #[ORM\ManyToMany(targetEntity: Stack::class)]
+    private Collection $ingredients;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Stack $dish = null;
 
     public function __construct()
     {
@@ -50,6 +50,18 @@ class Recipe
         return $this;
     }
 
+    public function getThroughput(): ?int
+    {
+        return $this->throughput;
+    }
+
+    public function setThroughput(int $throughput): static
+    {
+        $this->throughput = $throughput;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Stack>
      */
@@ -62,7 +74,6 @@ class Recipe
     {
         if (!$this->ingredients->contains($ingredient)) {
             $this->ingredients->add($ingredient);
-            $ingredient->setRecipe($this);
         }
 
         return $this;
@@ -70,36 +81,19 @@ class Recipe
 
     public function removeIngredient(Stack $ingredient): static
     {
-        if ($this->ingredients->removeElement($ingredient)) {
-            // set the owning side to null (unless already changed)
-            if ($ingredient->getRecipe() === $this) {
-                $ingredient->setRecipe(null);
-            }
-        }
+        $this->ingredients->removeElement($ingredient);
 
         return $this;
     }
 
     public function getDish(): ?Stack
     {
-        return $this->Dish;
+        return $this->dish;
     }
 
-    public function setDish(Stack $Dish): static
+    public function setDish(?Stack $dish): static
     {
-        $this->Dish = $Dish;
-
-        return $this;
-    }
-
-    public function getThroughput(): ?int
-    {
-        return $this->throughput;
-    }
-
-    public function setThroughput(int $throughput): static
-    {
-        $this->throughput = $throughput;
+        $this->dish = $dish;
 
         return $this;
     }

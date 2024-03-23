@@ -31,6 +31,11 @@ class ItemPrice
     #[ORM\Column(nullable: true)]
     private ?int $highPrice = null;
 
+    public function __toString(): string
+    {
+        return $this->getName();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
