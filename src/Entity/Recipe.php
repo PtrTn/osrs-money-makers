@@ -22,6 +22,7 @@ class Recipe
     private ?int $throughput = null;
 
     #[ORM\ManyToMany(targetEntity: Stack::class, cascade: ['persist', 'remove'])]
+    /** @var $ingredients Collection<Stack> */
     private Collection $ingredients;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
@@ -31,6 +32,26 @@ class Recipe
     public function __construct()
     {
         $this->ingredients = new ArrayCollection();
+    }
+
+    public function getInput(): int
+    {
+        $input = 0;
+        foreach ($this->ingredients as $ingredient) {
+            $input += $ingredient->getQuantity() * $ingredient->getItemPrice()->getAvgPrice();
+        }
+
+        return $input * $this->throughput;
+    }
+
+    public function getOutput(): int
+    {
+        return $this->dish->getQuantity() * $this->dish->getItemPrice()->getAvgPrice() * $this->throughput;
+    }
+
+    public function getAvgProfit(): int
+    {
+        return $this->getOutput() - $this->getInput();
     }
 
     public function getId(): ?int

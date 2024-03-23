@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All items{% endblock %}
+
+{% block body %}
+<div>
+    {% for recipe in recipes %}
+        <h1>{{ recipe.name }}</h1>
+        <h3>Input {{ recipe.input|price }}</h3>
+        {% for ingredient in recipe.ingredients %}
+            <p>{{ ingredient.itemPrice.Name }} x{{ ingredient.quantity }} for {{ ingredient.itemPrice.avgPrice }}gp/each</p>
+        {% endfor %}
+        <h3>Output {{ recipe.output|price }}</h3>
+        <p>{{ recipe.dish.itemPrice.Name }} x{{ recipe.dish.quantity }} for {{ recipe.dish.itemPrice.avgPrice }}gp/each</p>
+        <h3>Profit {{ recipe.avgProfit|price }}</h3>
+    {% endfor %}
+</div>
+{% endblock %}
