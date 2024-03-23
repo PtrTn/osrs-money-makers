@@ -24,7 +24,7 @@ class Recipe
     #[ORM\ManyToMany(targetEntity: Stack::class)]
     private Collection $ingredients;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade:['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Stack $dish = null;
 
