@@ -4,7 +4,6 @@ namespace App\Command;
 
 use App\Entity\ItemPrice;
 use App\Repository\ItemPriceRepository;
-use App\Repository\ItemRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,31 +33,52 @@ class ImportPricesCommand extends Command
         $this->itemPriceRepository->truncate();
 
         $io->info('Fetching latest item price data');
-        $data = $this->httpClient->request(
+        $priceData = $this->httpClient->request(
             'GET',
             'https://prices.runescape.wiki/api/v1/osrs/latest',
         );
-        $pricesFromApi = $data->toArray()['data'] ?? [];
-        $priceEntities = [];
-        foreach ($pricesFromApi as $itemId => $itemPrice) {
-            if (!isset($itemPrice['low'], $itemPrice['high'])) {
+        $pricesFromApi = $priceData->toArray()['data'] ?? [];
+
+        $io->info('Fetching item data');
+        $itemData = $this->httpClient->request(
+            'GET',
+            'https://prices.runescape.wiki/api/v1/osrs/mapping',
+        );
+        $itemsFromApi = $itemData->toArray();
+
+
+        $entities = [];
+        foreach ($itemsFromApi as $item) {
+            $id = $item['id'] ?? null;
+            $name = $item['name'] ?? null;
+            $examine = $item['examine'] ?? null;
+            if (!isset($id, $name, $examine)) {
+                $io->warning('Skipping item due to missing data');
+                continue;
+            }
+
+            $price = $pricesFromApi[$id] ?? null;
+            $lowPrice = $price['low'] ?? null;
+            $highPrice = $price['high'] ?? null;
+            if (!isset($price, $lowPrice, $highPrice)) {
                 $io->warning('Skipping item price due to missing data');
                 continue;
             }
 
-            $avgPrice = intval(round(($itemPrice['low'] + $itemPrice['high']) / 2));
+            $avgPrice = intval(round(($lowPrice + $highPrice) / 2));
             $entity = new ItemPrice();
+            $entity->setName($name);
+            $entity->setExamine($examine);
             $entity->setAvgPrice($avgPrice);
-            $entity->setLowPrice($itemPrice['low']);
-            $entity->setHighPrice($itemPrice['high']);
-            $entity->setItemId($itemId);
-            $priceEntities[] = $entity;
+            $entity->setLowPrice($lowPrice);
+            $entity->setHighPrice($highPrice);
+            $entities[] = $entity;
         }
 
         $io->info('Saving latest item price data');
-        $this->itemPriceRepository->save($priceEntities);
+        $this->itemPriceRepository->save($entities);
 
-        $io->success(sprintf('Successfully imported %s item prices', count($priceEntities)));
+        $io->success(sprintf('Successfully imported %s item prices', count($entities)));
 
         return Command::SUCCESS;
     }
