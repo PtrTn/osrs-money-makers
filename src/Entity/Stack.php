@@ -20,6 +20,10 @@ class Stack
     #[ORM\JoinColumn(nullable: false)]
     private ?ItemPrice $itemPrice = null;
 
+    #[ORM\ManyToOne(inversedBy: 'ingredients')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Recipe $recipe = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,6 +49,18 @@ class Stack
     public function setItemPrice(ItemPrice $itemPrice): static
     {
         $this->itemPrice = $itemPrice;
+
+        return $this;
+    }
+
+    public function getRecipe(): ?Recipe
+    {
+        return $this->recipe;
+    }
+
+    public function setRecipe(?Recipe $recipe): static
+    {
+        $this->recipe = $recipe;
 
         return $this;
     }
