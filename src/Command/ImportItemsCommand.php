@@ -46,9 +46,9 @@ class ImportItemsCommand extends Command
             }
 
             $entity = new Item();
-            $entity->setItemId($item['id']);
+//            $entity->setItemId($item['id']);
             $entity->setName($item['name']);
-            $entity->setDescription($item['examine']);
+            $entity->setExamine($item['examine']);
             $itemEntities[] = $entity;
         }
 

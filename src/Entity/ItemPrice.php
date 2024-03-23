@@ -13,85 +13,52 @@ class ItemPrice
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $ItemId = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $avg = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $LatestPrice = null;
+    private ?int $min = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $AvgPrice = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $LowPrice = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $HighPrice = null;
-
-    #[ORM\OneToOne(targetEntity: Item::class)]
-    private ?Item $item;
+    private ?int $max = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getItemId(): ?int
+    public function getAvg(): ?int
     {
-        return $this->ItemId;
+        return $this->avg;
     }
 
-    public function setItemId(int $ItemId): static
+    public function setAvg(?int $avg): static
     {
-        $this->ItemId = $ItemId;
+        $this->avg = $avg;
 
         return $this;
     }
 
-    public function getLatestPrice(): ?int
+    public function getMin(): ?int
     {
-        return $this->LatestPrice;
+        return $this->min;
     }
 
-    public function setLatestPrice(int $LatestPrice): static
+    public function setMin(?int $min): static
     {
-        $this->LatestPrice = $LatestPrice;
+        $this->min = $min;
 
         return $this;
     }
 
-    public function getAvgPrice(): ?int
+    public function getMax(): ?int
     {
-        return $this->AvgPrice;
+        return $this->max;
     }
 
-    public function setAvgPrice(int $AvgPrice): static
+    public function setMax(?int $max): static
     {
-        $this->AvgPrice = $AvgPrice;
-
-        return $this;
-    }
-
-    public function getLowPrice(): ?int
-    {
-        return $this->LowPrice;
-    }
-
-    public function setLowPrice(int $LowPrice): static
-    {
-        $this->LowPrice = $LowPrice;
-
-        return $this;
-    }
-
-    public function getHighPrice(): ?int
-    {
-        return $this->HighPrice;
-    }
-
-    public function setHighPrice(int $HighPrice): static
-    {
-        $this->HighPrice = $HighPrice;
+        $this->max = $max;
 
         return $this;
     }

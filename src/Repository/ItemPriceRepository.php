@@ -21,22 +21,28 @@ class ItemPriceRepository extends ServiceEntityRepository
         parent::__construct($registry, ItemPrice::class);
     }
 
-    public function truncate(): void
-    {
-        $this->createQueryBuilder('ip')
-            ->delete()
-            ->getQuery()
-            ->execute();
-    }
+    //    /**
+    //     * @return ItemPrice[] Returns an array of ItemPrice objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('i')
+    //            ->andWhere('i.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('i.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-    /** @param ItemPrice[] $itemEntities */
-    public function save(array $itemEntities): void
-    {
-        $entityManager = $this->getEntityManager();
-        foreach ($itemEntities as $entity) {
-            $entityManager->persist($entity);
-        }
-        $entityManager->flush();
-        $entityManager->clear();
-    }
+    //    public function findOneBySomeField($value): ?ItemPrice
+    //    {
+    //        return $this->createQueryBuilder('i')
+    //            ->andWhere('i.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

@@ -13,68 +13,53 @@ class Item
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $ItemId = null;
-
     #[ORM\Column(length: 255)]
-    private ?string $Name = null;
+    private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $Description = null;
+    private ?string $examine = null;
 
-    #[ORM\OneToOne(targetEntity: ItemPrice::class, inversedBy:'item')]
-    #[ORM\JoinColumn(name:'item_id', referencedColumnName:'item_id', nullable: true, onDelete: 'SET NULL')]
-    private ?ItemPrice $ItemPrice = null;
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name:'price_id', referencedColumnName:'id')]
+    private ?ItemPrice $price = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getItemId(): ?int
-    {
-        return $this->ItemId;
-    }
-
-    public function setItemId(int $ItemId): static
-    {
-        $this->ItemId = $ItemId;
-
-        return $this;
-    }
-
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): static
+    public function setName(string $name): static
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getExamine(): ?string
     {
-        return $this->Description;
+        return $this->examine;
     }
 
-    public function setDescription(?string $Description): static
+    public function setExamine(?string $examine): static
     {
-        $this->Description = $Description;
+        $this->examine = $examine;
 
         return $this;
     }
 
-    public function getItemPrice(): ?ItemPrice
+    public function getPrice(): ?ItemPrice
     {
-        return $this->ItemPrice;
+        return $this->price;
     }
 
-    public function setItemPrice(?ItemPrice $ItemPrice): self
+    public function setPrice(?ItemPrice $price): static
     {
-        $this->ItemPrice = $ItemPrice;
+        $this->price = $price;
 
         return $this;
     }
