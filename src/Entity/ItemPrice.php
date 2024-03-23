@@ -28,6 +28,9 @@ class ItemPrice
     #[ORM\Column(nullable: true)]
     private ?int $HighPrice = null;
 
+    #[ORM\OneToOne(targetEntity: Item::class)]
+    private ?Item $item;
+
     public function getId(): ?int
     {
         return $this->id;

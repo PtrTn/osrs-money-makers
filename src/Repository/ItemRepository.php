@@ -21,6 +21,20 @@ class ItemRepository extends ServiceEntityRepository
         parent::__construct($registry, Item::class);
     }
 
+    /** @return Item[] */
+    public function findAllWithPrice(): array
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT i, p
+            FROM App\Entity\Item i
+            INNER JOIN i.ItemPrice p'
+        );
+
+        return $query->getArrayResult();
+    }
+
     public function truncate(): void
     {
         $this->createQueryBuilder('i')

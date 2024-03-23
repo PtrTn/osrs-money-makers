@@ -22,6 +22,10 @@ class Item
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Description = null;
 
+    #[ORM\OneToOne(targetEntity: ItemPrice::class, inversedBy:'item')]
+    #[ORM\JoinColumn(name:'item_id', referencedColumnName:'item_id', nullable: true, onDelete: 'SET NULL')]
+    private ?ItemPrice $ItemPrice = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +63,18 @@ class Item
     public function setDescription(?string $Description): static
     {
         $this->Description = $Description;
+
+        return $this;
+    }
+
+    public function getItemPrice(): ?ItemPrice
+    {
+        return $this->ItemPrice;
+    }
+
+    public function setItemPrice(?ItemPrice $ItemPrice): self
+    {
+        $this->ItemPrice = $ItemPrice;
 
         return $this;
     }

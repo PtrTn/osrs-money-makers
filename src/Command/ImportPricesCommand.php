@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\ItemPrice;
+use App\Repository\ItemPriceRepository;
 use App\Repository\ItemRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -19,7 +20,7 @@ class ImportPricesCommand extends Command
 {
     public function __construct(
         private HttpClientInterface $httpClient,
-        private ItemRepository $itemRepository
+        private ItemPriceRepository $itemPriceRepository
     )
     {
         parent::__construct();
@@ -30,7 +31,7 @@ class ImportPricesCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $io->info('Removing existing item price data');
-        $this->itemRepository->truncate();
+        $this->itemPriceRepository->truncate();
 
         $io->info('Fetching latest item price data');
         $data = $this->httpClient->request(
@@ -55,7 +56,7 @@ class ImportPricesCommand extends Command
         }
 
         $io->info('Saving latest item price data');
-        $this->itemRepository->save($priceEntities);
+        $this->itemPriceRepository->save($priceEntities);
 
         $io->success(sprintf('Successfully imported %s item prices', count($priceEntities)));
 

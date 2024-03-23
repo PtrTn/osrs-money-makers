@@ -12,7 +12,7 @@ class ItemsController extends AbstractController
     #[Route('/', name: 'app_items')]
     public function index(ItemRepository $repository): Response
     {
-        $items = $repository->findAll();
+        $items = $repository->findAllWithPrice();
 
         return $this->render('items/index.html.twig', [
             'items' => $items,
