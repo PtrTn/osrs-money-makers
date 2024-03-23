@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ItemPrice;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,12 +22,9 @@ class ItemPriceRepository extends ServiceEntityRepository
         parent::__construct($registry, ItemPrice::class);
     }
 
-    public function truncate(): void
+    public function findAllAsCollection(): ArrayCollection
     {
-        $this->createQueryBuilder('ip')
-            ->delete()
-            ->getQuery()
-            ->execute();
+        return new ArrayCollection($this->findAll());
     }
 
     /** @param ItemPrice[] $entities */

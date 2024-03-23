@@ -13,6 +13,9 @@ class ItemPrice
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column]
+    private ?int $ItemId = null;
+
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -31,6 +34,18 @@ class ItemPrice
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getItemId(): ?int
+    {
+        return $this->ItemId;
+    }
+
+    public function setItemId(int $ItemId): static
+    {
+        $this->ItemId = $ItemId;
+
+        return $this;
     }
 
     public function getName(): ?string

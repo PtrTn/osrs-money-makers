@@ -19,8 +19,9 @@ when@dev:
             #    type: chromephp
             #    level: info
             console:
-                type: console
-                process_psr_3_messages: false
+                type: stream
+                path: "%kernel.logs_dir%/console.%kernel.environment%.log"
+                level: debug
                 channels: ["!event", "!doctrine", "!console"]
 
 when@test:

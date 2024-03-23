@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\ItemPrice;
 use App\Repository\ItemPriceRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,14 +13,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(
-    name: 'app:import:prices',
-    description: 'Imports prices for all items into the database',
+    name: 'app:update:prices',
+    description: 'Updates prices for all items into the database',
 )]
-class ImportPricesCommand extends Command
+class UpdatePricesCommand extends Command
 {
     public function __construct(
         private HttpClientInterface $httpClient,
-        private ItemPriceRepository $itemPriceRepository
+        private ItemPriceRepository $itemPriceRepository,
+        private LoggerInterface $logger
     )
     {
         parent::__construct();
@@ -28,9 +30,6 @@ class ImportPricesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
-        $io->info('Removing existing item price data');
-        $this->itemPriceRepository->truncate();
 
         $io->info('Fetching latest item price data');
         $priceData = $this->httpClient->request(
@@ -46,27 +45,42 @@ class ImportPricesCommand extends Command
         );
         $itemsFromApi = $itemData->toArray();
 
+        $io->info('Fetching existing item price data');
+        $itemPrices = $this->itemPriceRepository->findAllAsCollection();
+        $inserts = 0;
+        $updates = 0;
+        $skipped = 0;
 
         $entities = [];
         foreach ($itemsFromApi as $item) {
-            $id = $item['id'] ?? null;
+            $itemId = $item['id'] ?? null;
             $name = $item['name'] ?? null;
             $examine = $item['examine'] ?? null;
-            if (!isset($id, $name, $examine)) {
-                $io->warning('Skipping item due to missing data');
+            if (!isset($itemId, $name, $examine)) {
+                $skipped++;
+                $this->logger->warning('Skipping item due to missing data', $item);
                 continue;
             }
 
-            $price = $pricesFromApi[$id] ?? null;
+            $price = $pricesFromApi[$itemId] ?? null;
             $lowPrice = $price['low'] ?? null;
             $highPrice = $price['high'] ?? null;
             if (!isset($price, $lowPrice, $highPrice)) {
-                $io->warning('Skipping item price due to missing data');
+                $skipped++;
+                $this->logger->warning('Skipping item price due to missing data', ['id' => $itemId, 'price' => $pricesFromApi[$itemId] ?? null]);
                 continue;
             }
 
+            $entity = $itemPrices->findFirst(fn(int $id, ItemPrice $itemPrice) => $itemPrice->getItemId() === $itemId);
+            if ($entity === null) {
+                $inserts++;
+                $entity = new ItemPrice();
+            }
+            else {
+                $updates++;
+            }
             $avgPrice = intval(round(($lowPrice + $highPrice) / 2));
-            $entity = new ItemPrice();
+            $entity->setItemId($itemId);
             $entity->setName($name);
             $entity->setExamine($examine);
             $entity->setAvgPrice($avgPrice);
@@ -78,7 +92,7 @@ class ImportPricesCommand extends Command
         $io->info('Saving latest item price data');
         $this->itemPriceRepository->save($entities);
 
-        $io->success(sprintf('Successfully imported %s item prices', count($entities)));
+        $io->success(sprintf('Successfully added %s items and updated %s items. Skipped %s items due to errors', $inserts, $updates, $skipped));
 
         return Command::SUCCESS;
     }
