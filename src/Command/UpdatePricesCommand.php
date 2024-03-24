@@ -2,8 +2,8 @@
 
 namespace App\Command;
 
-use App\Entity\ItemPrice;
-use App\Repository\ItemPriceRepository;
+use App\Entity\Item;
+use App\Repository\ItemRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,8 +20,8 @@ class UpdatePricesCommand extends Command
 {
     public function __construct(
         private HttpClientInterface $httpClient,
-        private ItemPriceRepository $itemPriceRepository,
-        private LoggerInterface $logger
+        private ItemRepository      $itemRepository,
+        private LoggerInterface     $logger
     )
     {
         parent::__construct();
@@ -46,7 +46,7 @@ class UpdatePricesCommand extends Command
         $itemsFromApi = $itemData->toArray();
 
         $io->info('Fetching existing item price data');
-        $itemPrices = $this->itemPriceRepository->findAllAsCollection();
+        $itemsFromDatabase = $this->itemRepository->findAllAsCollection();
         $inserts = 0;
         $updates = 0;
         $skipped = 0;
@@ -71,16 +71,16 @@ class UpdatePricesCommand extends Command
                 continue;
             }
 
-            $entity = $itemPrices->findFirst(fn(int $id, ItemPrice $itemPrice) => $itemPrice->getItemId() === $itemId);
+            $entity = $itemsFromDatabase->findFirst(fn(int $id, Item $item) => $item->getGameId() === $itemId);
             if ($entity === null) {
                 $inserts++;
-                $entity = new ItemPrice();
+                $entity = new Item();
             }
             else {
                 $updates++;
             }
             $avgPrice = intval(round(($lowPrice + $highPrice) / 2));
-            $entity->setItemId($itemId);
+            $entity->setGameId($itemId);
             $entity->setName($name);
             $entity->setExamine($examine);
             $entity->setAvgPrice($avgPrice);
@@ -90,7 +90,7 @@ class UpdatePricesCommand extends Command
         }
 
         $io->info('Saving latest item price data');
-        $this->itemPriceRepository->save($entities);
+        $this->itemRepository->save($entities);
 
         $io->success(sprintf('Successfully added %s items and updated %s items. Skipped %s items due to errors', $inserts, $updates, $skipped));
 

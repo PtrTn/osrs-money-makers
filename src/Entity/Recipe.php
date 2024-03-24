@@ -38,7 +38,7 @@ class Recipe
     {
         $input = 0;
         foreach ($this->ingredients as $ingredient) {
-            $input += $ingredient->getQuantity() * $ingredient->getItemPrice()->getAvgPrice();
+            $input += $ingredient->getQuantity() * $ingredient->getItem()->getAvgPrice();
         }
 
         return $input * $this->throughput;
@@ -46,7 +46,7 @@ class Recipe
 
     public function getOutput(): int
     {
-        return $this->dish->getQuantity() * $this->dish->getItemPrice()->getAvgPrice() * $this->throughput;
+        return $this->dish->getQuantity() * $this->dish->getItem()->getAvgPrice() * $this->throughput;
     }
 
     public function getAvgProfit(): int

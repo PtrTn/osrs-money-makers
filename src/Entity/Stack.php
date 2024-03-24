@@ -18,11 +18,11 @@ class Stack
 
     #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ItemPrice $itemPrice = null;
+    private ?Item $item = null;
 
     public function __toString(): string
     {
-        return $this->itemPrice->getName() . ' (' . $this->quantity . ')';
+        return $this->item->getName() . ' (' . $this->quantity . ')';
     }
 
     public function getId(): ?int
@@ -42,14 +42,14 @@ class Stack
         return $this;
     }
 
-    public function getItemPrice(): ?ItemPrice
+    public function getItem(): ?Item
     {
-        return $this->itemPrice;
+        return $this->item;
     }
 
-    public function setItemPrice(ItemPrice $itemPrice): static
+    public function setItem(Item $item): static
     {
-        $this->itemPrice = $itemPrice;
+        $this->item = $item;
 
         return $this;
     }

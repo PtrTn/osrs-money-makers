@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ItemPriceRepository;
+use App\Repository\ItemRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ItemPriceRepository::class)]
-class ItemPrice
+#[ORM\Entity(repositoryClass: ItemRepository::class)]
+class Item
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -14,7 +14,7 @@ class ItemPrice
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $ItemId = null;
+    private ?int $gameId = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
@@ -41,14 +41,14 @@ class ItemPrice
         return $this->id;
     }
 
-    public function getItemId(): ?int
+    public function getGameId(): ?int
     {
-        return $this->ItemId;
+        return $this->gameId;
     }
 
-    public function setItemId(int $ItemId): static
+    public function setGameId(int $gameId): static
     {
-        $this->ItemId = $ItemId;
+        $this->gameId = $gameId;
 
         return $this;
     }

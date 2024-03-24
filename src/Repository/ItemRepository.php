@@ -2,24 +2,24 @@
 
 namespace App\Repository;
 
-use App\Entity\ItemPrice;
+use App\Entity\Item;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ItemPrice>
+ * @extends ServiceEntityRepository<Item>
  *
- * @method ItemPrice|null find($id, $lockMode = null, $lockVersion = null)
- * @method ItemPrice|null findOneBy(array $criteria, array $orderBy = null)
- * @method ItemPrice[]    findAll()
- * @method ItemPrice[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Item|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Item|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Item[]    findAll()
+ * @method Item[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ItemPriceRepository extends ServiceEntityRepository
+class ItemRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ItemPrice::class);
+        parent::__construct($registry, Item::class);
     }
 
     public function findAllAsCollection(): ArrayCollection
@@ -27,7 +27,7 @@ class ItemPriceRepository extends ServiceEntityRepository
         return new ArrayCollection($this->findAll());
     }
 
-    /** @param ItemPrice[] $entities */
+    /** @param Item[] $entities */
     public function save(array $entities): void
     {
         $entityManager = $this->getEntityManager();

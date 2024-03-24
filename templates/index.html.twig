@@ -34,11 +34,11 @@
                                 <th scope="row">{{ recipe.name }}</th>
                                 <td>
                                     {% for ingredient in recipe.ingredients %}
-                                        {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity }}x {{ ingredient.itemPrice.Name }} for {{ ingredient.itemPrice.avgPrice }}ea
+                                        {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity }}x {{ ingredient.item.Name }} for {{ ingredient.item.avgPrice }}ea
                                     {% endfor %}
                                 </td>
                                 <td>
-                                    {{ recipe.dish.quantity }}x {{ recipe.dish.itemPrice.Name }} for {{ recipe.dish.itemPrice.avgPrice }}ea
+                                    {{ recipe.dish.quantity }}x {{ recipe.dish.item.Name }} for {{ recipe.dish.item.avgPrice }}ea
                                 </td>
                                 <td>{{ recipe.throughput }} per hour</td>
                                 <td>{{ recipe.input|price }}</td>

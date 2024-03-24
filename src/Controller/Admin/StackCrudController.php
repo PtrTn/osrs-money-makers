@@ -16,7 +16,7 @@ class StackCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield AssociationField::new('itemPrice');
+        yield AssociationField::new('item');
         yield NumberField::new('quantity');
     }
 }
