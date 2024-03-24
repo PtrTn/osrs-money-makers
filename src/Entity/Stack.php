@@ -16,7 +16,7 @@ class Stack
     #[ORM\Column]
     private ?int $quantity = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?ItemPrice $itemPrice = null;
 

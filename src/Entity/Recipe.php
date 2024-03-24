@@ -21,11 +21,11 @@ class Recipe
     #[ORM\Column]
     private ?int $throughput = null;
 
-    #[ORM\ManyToMany(targetEntity: Stack::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: Stack::class, cascade: ['persist'])]
     /** @var $ingredients Collection<Stack> */
     private Collection $ingredients;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Stack $dish = null;
 
