@@ -3,16 +3,56 @@
 {% block title %}All items{% endblock %}
 
 {% block body %}
-<div>
-    {% for recipe in recipes %}
-        <h1>{{ recipe.name }}</h1>
-        <h3>Input {{ recipe.input|price }}</h3>
-        {% for ingredient in recipe.ingredients %}
-            <p>{{ ingredient.itemPrice.Name }} x{{ ingredient.quantity }} for {{ ingredient.itemPrice.avgPrice }}gp/each</p>
-        {% endfor %}
-        <h3>Output {{ recipe.output|price }}</h3>
-        <p>{{ recipe.dish.itemPrice.Name }} x{{ recipe.dish.quantity }} for {{ recipe.dish.itemPrice.avgPrice }}gp/each</p>
-        <h3>Profit {{ recipe.avgProfit|price }}</h3>
-    {% endfor %}
-</div>
+    <!-- Header-->
+    <header class="bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">OSRS money makers</h1>
+                <p class="lead fw-normal text-white-50 mb-0">For current prices</p>
+            </div>
+        </div>
+    </header>
+    <!-- Section-->
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Input</th>
+                            <th scope="col">Output</th>
+                            <th scope="col">Throughput</th>
+                            <th scope="col">Buy</th>
+                            <th scope="col">Sell</th>
+                            <th scope="col">Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for recipe in recipes %}
+                            <tr>
+                                <th scope="row">{{ recipe.name }}</th>
+                                <td>
+                                    {% for ingredient in recipe.ingredients %}
+                                        {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity }}x {{ ingredient.itemPrice.Name }} for {{ ingredient.itemPrice.avgPrice }}ea
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {{ recipe.dish.quantity }}x {{ recipe.dish.itemPrice.Name }} for {{ recipe.dish.itemPrice.avgPrice }}ea
+                                </td>
+                                <td>{{ recipe.throughput }} per hour</td>
+                                <td>{{ recipe.output|price }}</td>
+                                <td>{{ recipe.input|price }}</td>
+                                <td>{{ recipe.avgProfit|price }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Tetter Pon {{ "now"|date('Y') }}</p></div>
+    </footer>
 {% endblock %}
