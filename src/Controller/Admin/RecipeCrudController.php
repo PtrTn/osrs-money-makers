@@ -7,7 +7,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class RecipeCrudController extends AbstractCrudController
 {
@@ -18,9 +17,8 @@ class RecipeCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield TextField::new('name');
-        yield NumberField::new('throughput');
-        yield CollectionField::new('ingredients')->useEntryCrudForm();
         yield AssociationField::new('dish')->renderAsEmbeddedForm();
+        yield CollectionField::new('ingredients')->useEntryCrudForm();
+        yield NumberField::new('throughput');
     }
 }

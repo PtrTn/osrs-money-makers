@@ -37,7 +37,6 @@ class DriftNetFixtures extends Fixture
         $juteFibreStack->setItem($juteFibreItem);
 
         $driftNetRecipe = new Recipe();
-        $driftNetRecipe->setName('Drift nets');
         $driftNetRecipe->setThroughput(1100);
         $driftNetRecipe->setDish($driftNetStack);
         $driftNetRecipe->addIngredient($juteFibreStack);

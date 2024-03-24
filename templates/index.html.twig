@@ -31,14 +31,14 @@
                     <tbody>
                         {% for recipe in recipes %}
                             <tr>
-                                <th scope="row">{{ recipe.name }}</th>
+                                <th scope="row">{{ recipe.dish.item.name }}</th>
                                 <td>
                                     {% for ingredient in recipe.ingredients %}
                                         {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity }}x {{ ingredient.item.Name }} for {{ ingredient.item.avgPrice }}ea
                                     {% endfor %}
                                 </td>
                                 <td>
-                                    {{ recipe.dish.quantity }}x {{ recipe.dish.item.Name }} for {{ recipe.dish.item.avgPrice }}ea
+                                    {{ recipe.dish.quantity }}x {{ recipe.dish.item.name }} for {{ recipe.dish.item.avgPrice }}ea
                                 </td>
                                 <td>{{ recipe.throughput }} per hour</td>
                                 <td>{{ recipe.input|price }}</td>
