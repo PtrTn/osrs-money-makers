@@ -41,6 +41,7 @@
                                         <tr>
                                             <th class="text-secondary fw-normal">Inputs</th>
                                             <th class="text-secondary fw-normal">Outputs</th>
+                                            <th class="text-secondary fw-normal">Cut</th>
                                             <th class="text-secondary fw-normal">Throughput</th>
                                         </tr>
                                         </thead>
@@ -55,6 +56,7 @@
                                             <td>
                                                 {{ recipe.dish.quantity * recipe.throughput }} x {{ recipe.dish.item.name }}  <img src="{{ imageBaseUrl }}{{ recipe.dish.item.gameId }}.gif"/> for {{ recipe.dish.item.avgPrice }}ea
                                             </td>
+                                            <td>{{ recipe.grandExchangeCut|price }}</td>
                                             <td>{{ recipe.throughput }} per hour</td>
                                         </tr>
                                         </tbody>

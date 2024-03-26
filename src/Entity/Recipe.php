@@ -46,9 +46,14 @@ class Recipe
         return $this->dish->getQuantity() * $this->dish->getItem()->getAvgPrice() * $this->throughput;
     }
 
+    public function getGrandExchangeCut(): int
+    {
+        return $this->getOutput() * 0.01;
+    }
+
     public function getAvgProfit(): int
     {
-        return $this->getOutput() - $this->getInput();
+        return $this->getOutput() - $this->getGrandExchangeCut() - $this->getInput();
     }
 
     public function getId(): ?int
