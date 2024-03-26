@@ -16,36 +16,45 @@
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                <table class="table">
+                <table class="table table-hover table-borderless">
                     <thead>
-                        <tr>
-                            <th scope="col"></th>
-                            <th scope="col">Buy</th>
-                            <th scope="col">Sell</th>
-                            <th scope="col">Profit</th>
-                        </tr>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Buy</th>
+                        <th scope="col">Sell</th>
+                        <th scope="col">Profit</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for recipe in recipes %}
-                            <tr data-bs-toggle="collapse" data-bs-target="#r{{ loop.index }}">
-                                <th scope="row">{{ recipe.dish.item.name }}</th>
-                                <td>{{ recipe.input|price }}</td>
-                                <td>{{ recipe.output|price }}</td>
-                                <td>{{ recipe.avgProfit|price }}</td>
-                            </tr>
-                            <tr class="collapse accordion-collapse" id="r{{ loop.index }}" data-bs-parent=".table">
-                                <td>{{ recipe.throughput }} per hour</td>
-                                <td>
-                                    {% for ingredient in recipe.ingredients %}
-                                        {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity * recipe.throughput }} x {{ ingredient.item.Name }} for {{ ingredient.item.avgPrice }}ea
-                                    {% endfor %}
-                                </td>
-                                <td>
-                                    {{ recipe.dish.quantity * recipe.throughput }} x {{ recipe.dish.item.name }} for {{ recipe.dish.item.avgPrice }}ea
-                                </td>
-                                <td></td>
-                            </tr>
-                        {% endfor %}
+                    {% for recipe in recipes %}
+                        <tr data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" role="button">
+                            <th scope="row">{{ recipe.dish.item.name }}</th>
+                            <td>{{ recipe.input|price }}</td>
+                            <td>{{ recipe.output|price }}</td>
+                            <td>{{ recipe.avgProfit|price }}</td>
+                        </tr>
+                        <tr class="collapseContainingDiv">
+                            <td colspan="4" class="p-0">
+                                <div class="collapse" id="collapse{{ loop.index }}" style="">
+                                    <table class="table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Example</th>
+                                            <th scope="col">Example 2</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>Data 1</td>
+                                            <td>Data 2</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+{#                                    <div class="p-2">SECOND Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.</div>#}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
