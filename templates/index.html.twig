@@ -33,26 +33,33 @@
                             <td>{{ recipe.output|price }}</td>
                             <td>{{ recipe.avgProfit|price }}</td>
                         </tr>
-                        <tr class="collapseContainingDiv">
+                        <tr>
                             <td colspan="4" class="p-0">
-                                <div class="collapse" id="collapse{{ loop.index }}" style="">
-                                    <table class="table mb-0">
+                                <div class="collapse" id="collapse{{ loop.index }}">
+                                    <table class="table table-borderless table-light mb-0">
                                         <thead>
                                         <tr>
-                                            <th scope="col">Example</th>
-                                            <th scope="col">Example 2</th>
+                                            <th class="text-secondary fw-normal">Inputs</th>
+                                            <th class="text-secondary fw-normal">Outputs</th>
+                                            <th class="text-secondary fw-normal">Throughput</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td>Data 1</td>
-                                            <td>Data 2</td>
+                                            <td>
+                                                {% for ingredient in recipe.ingredients %}
+                                                    {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity * recipe.throughput }} x {{ ingredient.item.Name }} for {{ ingredient.item.avgPrice }}ea
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {{ recipe.dish.quantity * recipe.throughput }} x {{ recipe.dish.item.name }} for {{ recipe.dish.item.avgPrice }}ea
+                                            </td>
+                                            <td>{{ recipe.throughput }} per hour</td>
                                         </tr>
                                         </tbody>
                                     </table>
-{#                                    <div class="p-2">SECOND Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.</div>#}
                                 </div>
-                            </td>
+                                </td>
                         </tr>
                     {% endfor %}
                     </tbody>
