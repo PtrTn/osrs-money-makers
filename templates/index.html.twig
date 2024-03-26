@@ -20,9 +20,6 @@
                     <thead>
                         <tr>
                             <th scope="col"></th>
-                            <th scope="col">Input</th>
-                            <th scope="col">Output</th>
-                            <th scope="col">Throughput</th>
                             <th scope="col">Buy</th>
                             <th scope="col">Sell</th>
                             <th scope="col">Profit</th>
@@ -30,20 +27,23 @@
                     </thead>
                     <tbody>
                         {% for recipe in recipes %}
-                            <tr>
+                            <tr data-bs-toggle="collapse" data-bs-target="#r{{ loop.index }}">
                                 <th scope="row">{{ recipe.dish.item.name }}</th>
-                                <td>
-                                    {% for ingredient in recipe.ingredients %}
-                                        {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity }}x {{ ingredient.item.Name }} for {{ ingredient.item.avgPrice }}ea
-                                    {% endfor %}
-                                </td>
-                                <td>
-                                    {{ recipe.dish.quantity }}x {{ recipe.dish.item.name }} for {{ recipe.dish.item.avgPrice }}ea
-                                </td>
-                                <td>{{ recipe.throughput }} per hour</td>
                                 <td>{{ recipe.input|price }}</td>
                                 <td>{{ recipe.output|price }}</td>
                                 <td>{{ recipe.avgProfit|price }}</td>
+                            </tr>
+                            <tr class="collapse accordion-collapse" id="r{{ loop.index }}" data-bs-parent=".table">
+                                <td>{{ recipe.throughput }} per hour</td>
+                                <td>
+                                    {% for ingredient in recipe.ingredients %}
+                                        {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity * recipe.throughput }} x {{ ingredient.item.Name }} for {{ ingredient.item.avgPrice }}ea
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {{ recipe.dish.quantity * recipe.throughput }} x {{ recipe.dish.item.name }} for {{ recipe.dish.item.avgPrice }}ea
+                                </td>
+                                <td></td>
                             </tr>
                         {% endfor %}
                     </tbody>
