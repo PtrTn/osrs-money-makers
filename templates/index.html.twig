@@ -48,11 +48,12 @@
                                         <tr>
                                             <td>
                                                 {% for ingredient in recipe.ingredients %}
-                                                    {% if not loop.first %}<br>{% endif %}{{ ingredient.quantity * recipe.throughput }} x {{ ingredient.item.Name }} for {{ ingredient.item.avgPrice }}ea
+                                                    {% if not loop.first %}<br>{% endif %}
+                                                    {{ ingredient.quantity * recipe.throughput }} x {{ ingredient.item.name }} <img src="{{ imageBaseUrl }}{{ ingredient.item.gameId }}.gif"/> for {{ ingredient.item.avgPrice }}ea
                                                 {% endfor %}
                                             </td>
                                             <td>
-                                                {{ recipe.dish.quantity * recipe.throughput }} x {{ recipe.dish.item.name }} for {{ recipe.dish.item.avgPrice }}ea
+                                                {{ recipe.dish.quantity * recipe.throughput }} x {{ recipe.dish.item.name }}  <img src="{{ imageBaseUrl }}{{ recipe.dish.item.gameId }}.gif"/> for {{ recipe.dish.item.avgPrice }}ea
                                             </td>
                                             <td>{{ recipe.throughput }} per hour</td>
                                         </tr>

@@ -19,6 +19,7 @@ class RecipeProfitController extends AbstractController
 
         return $this->render('index.html.twig', [
             'recipes' => $recipes,
+            'imageBaseUrl' => '/images/items/'
         ]);
     }
 }
