@@ -9,10 +9,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(
@@ -38,9 +40,14 @@ class UpdateImagesCommand extends Command
         $this->projectRoot = $projectRoot;
     }
 
+    public function configure(): void
+    {
+        $this->addOption('refresh', 'r', InputOption::VALUE_OPTIONAL, 'Refresh existing images too', false);
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // todo, only update if flag is supplied?
+        $refresh = $input->getOption('refresh');
         $io = new SymfonyStyle($input, $output);
 
         $io->info('Fetching item data from database');
@@ -52,29 +59,50 @@ class UpdateImagesCommand extends Command
         $updates = 0;
         $failures = 0;
 
-        $io->progressStart($itemIds->count());
-        foreach ($itemIds as $itemId) {
-            $response = $this->httpClient->request('GET', self::IMAGE_BASE_URL . $itemId);
-            if ($response->getStatusCode() !== 200) {
-                $this->logger->warning('Unable to find image', ['itemId' => $itemId]);
-                $failures++;
-                continue;
-            }
-            try {
-                $stream = $response->toStream();
+        $progressBar = $io->createProgressBar($itemIds->count());
+        $progressBar->setFormat('very_verbose');
+        $chunks = array_chunk($itemIds->toArray(), 50);
+        foreach ($chunks as $chunk) {
+            $responses = [];
+            foreach ($chunk as $itemId) {
                 $destination = join(DIRECTORY_SEPARATOR, [$this->projectRoot, self::IMAGE_PATH, $itemId . '.gif']);
-                $this->filesystem->dumpFile($destination, $stream);
-            } catch(Exception $exception) {
-                $this->logger->warning('Unable to save image contents to file', ['itemId' => $itemId, 'exception' => $exception]);
-                $failures++;
-                continue;
-            }
+                if ($refresh === false && $this->filesystem->exists($destination)) {
+                    continue;
+                }
 
-            $this->filesystem->exists($destination) ? $updates++ : $additions++;
-            $io->progressAdvance();
+                $responses[] = $this->httpClient->request(
+                    'GET',
+                    self::IMAGE_BASE_URL . $itemId,
+                    ['user_data' => $itemId, 'extra' => ['trace_content' => false]]
+                );
+            }
+            foreach ($responses as $response) {
+                $itemId = $response->getInfo('user_data');
+                try {
+                    if ($response->getStatusCode() === 429) {
+                        $io->error('Reached api limit, aborting');
+                        return Command::FAILURE;
+                    }
+                    if ($response->getStatusCode() !== 200) {
+                        $this->logger->warning('Unable to find image', ['itemId' => $itemId]);
+                        $failures++;
+                        continue;
+                    }
+                    $stream = $response->toStream();
+                    $destination = join(DIRECTORY_SEPARATOR, [$this->projectRoot, self::IMAGE_PATH, $itemId . '.gif']);
+                    $this->filesystem->dumpFile($destination, $stream);
+                } catch(Exception | ExceptionInterface $exception) {
+                    $this->logger->warning('Unable to save image contents to file', ['itemId' => $itemId, 'exception' => $exception]);
+                    $failures++;
+                    continue;
+                }
+
+                $this->filesystem->exists($destination) ? $updates++ : $additions++;
+                $progressBar->advance();
+            }
         }
 
-        $io->progressFinish();
+        $progressBar->finish();
         $io->success(sprintf('Successfully added %s images and updated %s images. Skipped %s images due to errors', $additions, $updates, $failures));
 
         return Command::SUCCESS;
