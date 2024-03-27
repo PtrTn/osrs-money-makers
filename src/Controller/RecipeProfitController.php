@@ -17,9 +17,6 @@ class RecipeProfitController extends AbstractController
 
         uasort($recipes, fn(Recipe $recipeA, Recipe $recipeB) => $recipeB->getAvgProfit() <=> $recipeA->getAvgProfit());
 
-        return $this->render('index.html.twig', [
-            'recipes' => $recipes,
-            'imageBaseUrl' => '/images/items/'
-        ]);
+        return $this->render('index.html.twig', ['recipes' => $recipes]);
     }
 }

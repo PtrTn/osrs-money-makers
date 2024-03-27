@@ -89,6 +89,15 @@ class UpdatePricesCommand extends Command
             $entities[] = $entity;
         }
 
+        $coins = new Item();
+        $coins->setName('Coins');
+        $coins->setAvgPrice(1);
+        $coins->setLowPrice(1);
+        $coins->setHighPrice(1);
+        $coins->setGameId(617);
+        $coins->setExamine('Lovely money!');
+        $entities[] = $coins;
+
         $io->info('Saving latest item price data');
         $this->itemRepository->save($entities);
 

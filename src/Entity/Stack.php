@@ -25,6 +25,29 @@ class Stack
         return $this->item->getName() . ' (' . $this->quantity . ')';
     }
 
+    public function getImage(): string
+    {
+        $file = $this->item->getGameId() . '.gif';
+        if ($this->item->isMoney()) {
+            if ($this->quantity > 1) {
+                $file = 'coins_1.png';
+            }
+            if ($this->quantity > 25) {
+                $file = 'coins_25.png';
+            }
+            if ($this->quantity > 100) {
+                $file = 'coins_100.png';
+            }
+            if ($this->quantity > 1000) {
+                $file = 'coins_1000.png';
+            }
+            if ($this->quantity > 10000) {
+                $file = 'coins_10000.png';
+            }
+        }
+        return 'images/items/' . $file;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

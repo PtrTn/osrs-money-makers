@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
 class Item
 {
+    private const COINS_GAME_ID = 617;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -34,6 +36,11 @@ class Item
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function isMoney(): bool
+    {
+        return $this->gameId === self::COINS_GAME_ID;
     }
 
     public function getId(): ?int

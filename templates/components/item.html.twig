@@ -1,1 +1,8 @@
-<p class="m-0"><img class="me-1" src="{{ imageBaseUrl }}{{ stack.item.gameId }}.gif"/>{{ stack.quantity * recipe.throughput }} {{ stack.item.name }} ({{ stack.item.avgPrice }}ea)</p>
+<p class="m-0">
+    <img class="me-1" src="{{ stack.image }}"/>
+    {% if not stack.item.isMoney %}
+        {{ stack.quantity * recipe.throughput }} {{ stack.item.name }} ({{ stack.item.avgPrice }}ea)
+    {% else %}
+        {{ (stack.quantity * recipe.throughput)|price(2) }} {{ stack.item.name }} ({{ stack.quantity }}ea)
+    {% endif %}
+</p>

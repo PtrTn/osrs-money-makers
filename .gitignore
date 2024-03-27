@@ -25,4 +25,4 @@
 ###< symfony/asset-mapper ###
 
 .idea
-public/images/items
+public/images/items/*.gif
