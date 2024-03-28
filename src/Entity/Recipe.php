@@ -35,7 +35,7 @@ class Recipe
     {
         $input = 0;
         foreach ($this->ingredients as $ingredient) {
-            $input += $ingredient->getQuantity() * $ingredient->getItem()->getAvgPrice();
+            $input += $ingredient->getQuantity() * $ingredient->getItem()->getBuyPrice();
         }
 
         return $input * $this->throughput;
@@ -43,7 +43,7 @@ class Recipe
 
     public function getOutput(): int
     {
-        return $this->dish->getQuantity() * $this->dish->getItem()->getAvgPrice() * $this->throughput;
+        return $this->dish->getQuantity() * $this->dish->getItem()->getSellPrice() * $this->throughput;
     }
 
     public function getGrandExchangeCut(): int

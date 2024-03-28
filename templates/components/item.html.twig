@@ -1,7 +1,9 @@
 <p class="m-0">
     <img class="me-1" src="{{ stack.image }}"/>
     {% if not stack.item.isMoney %}
-        {{ stack.quantity * recipe.throughput }} {{ stack.item.name }} ({{ stack.item.avgPrice }}ea)
+        {{ stack.quantity * recipe.throughput }} {{ stack.item.name }}
+        {% if type == 'buy' %}({{ stack.item.buyPrice }}ea){% endif %}
+        {% if type == 'sell' %}({{ stack.item.sellPrice }}ea){% endif %}
     {% else %}
         {{ (stack.quantity * recipe.throughput)|price(2) }} {{ stack.item.name }} ({{ stack.quantity }}ea)
     {% endif %}

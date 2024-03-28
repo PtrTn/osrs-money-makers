@@ -33,12 +33,6 @@ class Price
         $this->items = new ArrayCollection();
     }
 
-    public function getAvg(): int
-    {
-        // todo, what if either low or high is 'null'?
-        return (int) round(($this->low + $this->high) / 2);
-    }
-
     public function getId(): ?int
     {
         return $this->id;

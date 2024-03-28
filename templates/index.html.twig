@@ -36,11 +36,11 @@
                             </div>
                             <div class="col">
                                 {% for ingredient in recipe.ingredients %}
-                                    {% include 'components/item.html.twig' with {'stack': ingredient } %}
+                                    {% include 'components/item.html.twig' with {'stack': ingredient, 'type': 'buy' } %}
                                 {% endfor %}
                             </div>
                             <div class="col">
-                                {% include 'components/item.html.twig' with {'stack': recipe.dish } %}
+                                {% include 'components/item.html.twig' with {'stack': recipe.dish, 'type': 'sell' } %}
                             </div>
                             <div class="col-2">
                                 {{ recipe.grandExchangeCut|price }} cut

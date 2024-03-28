@@ -35,12 +35,20 @@ class Item
         $this->prices = new ArrayCollection();
     }
 
-    public function getAvgPrice(): int
+    public function getSellPrice(): int
     {
         /** @var Price $mostRecentPrice */
         $mostRecentPrice = $this->prices->first();
 
-        return $mostRecentPrice->getAvg();
+        return $mostRecentPrice->getLow();
+    }
+
+    public function getBuyPrice(): int
+    {
+        /** @var Price $mostRecentPrice */
+        $mostRecentPrice = $this->prices->first();
+
+        return $mostRecentPrice->getHigh();
     }
 
     public function __toString(): string
