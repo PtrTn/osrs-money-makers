@@ -15,57 +15,39 @@
     <!-- Section-->
     <section class="py-5" style="min-height: 72vh;">
         <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                <table class="table table-hover table-borderless">
-                    <thead>
-                    <tr>
-                        <th scope="col"></th>
-                        <th scope="col">Buy</th>
-                        <th scope="col">Sell</th>
-                        <th scope="col">Profit</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="container">
+                    <div class="row py-2">
+                        <div class="col fw-bold"></div>
+                        <div class="col fw-bold">Buy</div>
+                        <div class="col fw-bold">Sell</div>
+                        <div class="col-2 fw-bold">Profit</div>
+                    </div>
                     {% for recipe in recipes %}
-                        <tr data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" role="button">
-                            <th scope="row">{{ recipe.dish.item.name }}</th>
-                            <td>{{ recipe.input|price }}</td>
-                            <td>{{ recipe.output|price }}</td>
-                            <td>{{ recipe.avgProfit|price }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="4" class="p-0">
-                                <div class="collapse" id="collapse{{ loop.index }}">
-                                    <table class="table table-borderless table-light mb-0">
-                                        <thead>
-                                        <tr>
-                                            <th class="text-secondary fw-normal">Inputs</th>
-                                            <th class="text-secondary fw-normal">Outputs</th>
-                                            <th class="text-secondary fw-normal">Cut</th>
-                                            <th class="text-secondary fw-normal">Throughput</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr class="align-middle">
-                                            <td>
-                                                {% for ingredient in recipe.ingredients %}
-                                                    {% include 'components/item.html.twig' with {'stack': ingredient } %}
-                                                {% endfor %}
-                                            </td>
-                                            <td>
-                                                {% include 'components/item.html.twig' with {'stack': recipe.dish } %}
-                                            </td>
-                                            <td>{{ recipe.grandExchangeCut|price }}</td>
-                                            <td>{{ recipe.throughput }} per hour</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                </td>
-                        </tr>
+                        <div class="row py-2" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" role="button">
+                            <div class="col fw-bold">{{ recipe.dish.item.name }}</div>
+                            <div class="col">{{ recipe.input|price }}</div>
+                            <div class="col">{{ recipe.output|price }}</div>
+                            <div class="col-2">{{ recipe.avgProfit|price }}</div>
+                        </div>
+                        <div class="row py-2 collapse bg-light" id="collapse{{ loop.index }}">
+                            <div class="col">
+                                {{ recipe.throughput }} per hour
+                            </div>
+                            <div class="col">
+                                {% for ingredient in recipe.ingredients %}
+                                    {% include 'components/item.html.twig' with {'stack': ingredient } %}
+                                {% endfor %}
+                            </div>
+                            <div class="col">
+                                {% include 'components/item.html.twig' with {'stack': recipe.dish } %}
+                            </div>
+                            <div class="col-2">
+                                {{ recipe.grandExchangeCut|price }} cut
+                            </div>
+                        </div>
                     {% endfor %}
-                    </tbody>
-                </table>
+                </div>
             </div>
         </div>
     </section>
