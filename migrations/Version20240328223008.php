@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240324122109 extends AbstractMigration
+final class Version20240328223008 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,10 +20,14 @@ final class Version20240324122109 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE item (id INT AUTO_INCREMENT NOT NULL, game_id INT NOT NULL, name VARCHAR(255) NOT NULL, examine VARCHAR(255) DEFAULT NULL, avg_price INT DEFAULT NULL, low_price INT DEFAULT NULL, high_price INT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE item (id INT AUTO_INCREMENT NOT NULL, game_id INT NOT NULL, name VARCHAR(255) NOT NULL, examine VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE item_price (item_id INT NOT NULL, price_id INT NOT NULL, INDEX IDX_E06F3909126F525E (item_id), INDEX IDX_E06F3909D614C7E7 (price_id), PRIMARY KEY(item_id, price_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE price (id INT AUTO_INCREMENT NOT NULL, high INT DEFAULT NULL, low INT DEFAULT NULL, date DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE recipe (id INT AUTO_INCREMENT NOT NULL, dish_id INT NOT NULL, throughput INT NOT NULL, INDEX IDX_DA88B137148EB0CB (dish_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE recipe_stack (recipe_id INT NOT NULL, stack_id INT NOT NULL, INDEX IDX_57BBAF7559D8A214 (recipe_id), INDEX IDX_57BBAF7537C70060 (stack_id), PRIMARY KEY(recipe_id, stack_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE stack (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, quantity INT NOT NULL, INDEX IDX_41A87B6A126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE item_price ADD CONSTRAINT FK_E06F3909126F525E FOREIGN KEY (item_id) REFERENCES item (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE item_price ADD CONSTRAINT FK_E06F3909D614C7E7 FOREIGN KEY (price_id) REFERENCES price (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE recipe ADD CONSTRAINT FK_DA88B137148EB0CB FOREIGN KEY (dish_id) REFERENCES stack (id)');
         $this->addSql('ALTER TABLE recipe_stack ADD CONSTRAINT FK_57BBAF7559D8A214 FOREIGN KEY (recipe_id) REFERENCES recipe (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE recipe_stack ADD CONSTRAINT FK_57BBAF7537C70060 FOREIGN KEY (stack_id) REFERENCES stack (id) ON DELETE CASCADE');
@@ -33,11 +37,15 @@ final class Version20240324122109 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE item_price DROP FOREIGN KEY FK_E06F3909126F525E');
+        $this->addSql('ALTER TABLE item_price DROP FOREIGN KEY FK_E06F3909D614C7E7');
         $this->addSql('ALTER TABLE recipe DROP FOREIGN KEY FK_DA88B137148EB0CB');
         $this->addSql('ALTER TABLE recipe_stack DROP FOREIGN KEY FK_57BBAF7559D8A214');
         $this->addSql('ALTER TABLE recipe_stack DROP FOREIGN KEY FK_57BBAF7537C70060');
         $this->addSql('ALTER TABLE stack DROP FOREIGN KEY FK_41A87B6A126F525E');
         $this->addSql('DROP TABLE item');
+        $this->addSql('DROP TABLE item_price');
+        $this->addSql('DROP TABLE price');
         $this->addSql('DROP TABLE recipe');
         $this->addSql('DROP TABLE recipe_stack');
         $this->addSql('DROP TABLE stack');

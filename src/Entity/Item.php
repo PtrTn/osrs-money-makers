@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
@@ -24,14 +26,22 @@ class Item
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $examine = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $avgPrice = null;
+    #[ORM\ManyToMany(targetEntity: Price::class, inversedBy: 'item')]
+    #[ORM\OrderBy(['date' => 'DESC'])]
+    private Collection $prices;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $lowPrice = null;
+    public function __construct()
+    {
+        $this->prices = new ArrayCollection();
+    }
 
-    #[ORM\Column(nullable: true)]
-    private ?int $highPrice = null;
+    public function getAvgPrice(): int
+    {
+        /** @var Price $mostRecentPrice */
+        $mostRecentPrice = $this->prices->first();
+
+        return $mostRecentPrice->getAvg();
+    }
 
     public function __toString(): string
     {
@@ -84,38 +94,26 @@ class Item
         return $this;
     }
 
-    public function getAvgPrice(): ?int
+    /**
+     * @return Collection<int, Price>
+     */
+    public function getPrices(): Collection
     {
-        return $this->avgPrice;
+        return $this->prices;
     }
 
-    public function setAvgPrice(?int $avgPrice): static
+    public function addPrice(Price $price): static
     {
-        $this->avgPrice = $avgPrice;
+        if (!$this->prices->contains($price)) {
+            $this->prices->add($price);
+        }
 
         return $this;
     }
 
-    public function getLowPrice(): ?int
+    public function removePrice(Price $price): static
     {
-        return $this->lowPrice;
-    }
-
-    public function setLowPrice(?int $lowPrice): static
-    {
-        $this->lowPrice = $lowPrice;
-
-        return $this;
-    }
-
-    public function getHighPrice(): ?int
-    {
-        return $this->highPrice;
-    }
-
-    public function setHighPrice(?int $highPrice): static
-    {
-        $this->highPrice = $highPrice;
+        $this->prices->removeElement($price);
 
         return $this;
     }

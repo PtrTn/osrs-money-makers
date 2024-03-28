@@ -3,7 +3,10 @@
 namespace App\Command;
 
 use App\Entity\Item;
+use App\Entity\Price;
 use App\Repository\ItemRepository;
+use App\Repository\PriceRepository;
+use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -14,12 +17,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(
     name: 'app:update:prices',
-    description: 'Updates prices for all items into the database',
+    description: 'Imports all prices the database',
 )]
 class UpdatePricesCommand extends Command
 {
     public function __construct(
         private HttpClientInterface $httpClient,
+        private PriceRepository     $priceRepository,
         private ItemRepository      $itemRepository,
         private LoggerInterface     $logger
     )
@@ -31,77 +35,50 @@ class UpdatePricesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->info('Fetching latest item price data');
+        $io->info('Fetching price data from Runescape wiki');
         $priceData = $this->httpClient->request(
             'GET',
             'https://prices.runescape.wiki/api/v1/osrs/latest',
         );
         $pricesFromApi = $priceData->toArray()['data'] ?? [];
 
-        $io->info('Fetching item data');
-        $itemData = $this->httpClient->request(
-            'GET',
-            'https://prices.runescape.wiki/api/v1/osrs/mapping',
-        );
-        $itemsFromApi = $itemData->toArray();
-
-        $io->info('Fetching existing item price data');
+        $io->info('Fetching item data from database');
         $itemsFromDatabase = $this->itemRepository->findAllAsCollection();
+
         $inserts = 0;
-        $updates = 0;
         $skipped = 0;
-
         $entities = [];
-        foreach ($itemsFromApi as $item) {
-            $itemId = $item['id'] ?? null;
-            $name = $item['name'] ?? null;
-            $examine = $item['examine'] ?? null;
-            if (!isset($itemId, $name, $examine)) {
-                $skipped++;
-                $this->logger->warning('Skipping item due to missing data', $item);
-                continue;
-            }
-
-            $price = $pricesFromApi[$itemId] ?? null;
+        foreach ($pricesFromApi as $itemGameId => $price) {
             $lowPrice = $price['low'] ?? null;
             $highPrice = $price['high'] ?? null;
             if (!isset($price, $lowPrice, $highPrice)) {
                 $skipped++;
-                $this->logger->warning('Skipping item price due to missing data', ['id' => $itemId, 'price' => $pricesFromApi[$itemId] ?? null]);
+                $this->logger->warning('Skipping item price due to missing data', ['itemGameId' => $itemGameId, 'price' => $price ?? null]);
                 continue;
             }
 
-            $entity = $itemsFromDatabase->findFirst(fn(int $id, Item $item) => $item->getGameId() === $itemId);
-            if ($entity === null) {
-                $inserts++;
-                $entity = new Item();
+            $itemEntity = $itemsFromDatabase->findFirst(fn(int $id, Item $item) => $item->getGameId() === $itemGameId);
+            if ($itemEntity === null) {
+                $skipped++;
+                $this->logger->warning('Skipping item price as it cant be mapped to an item', ['itemGameId' => $itemGameId]);
+                continue;
             }
-            else {
-                $updates++;
-            }
-            $avgPrice = intval(round(($lowPrice + $highPrice) / 2));
-            $entity->setGameId($itemId);
-            $entity->setName($name);
-            $entity->setExamine($examine);
-            $entity->setAvgPrice($avgPrice);
-            $entity->setLowPrice($lowPrice);
-            $entity->setHighPrice($highPrice);
-            $entities[] = $entity;
+
+            $priceEntity = new Price();
+            $priceEntity->setHigh($highPrice);
+            $priceEntity->setLow($lowPrice);
+            $priceEntity->setDate(new DateTimeImmutable('now'));
+            $priceEntity->addItem($itemEntity);
+            $inserts++;
+
+            $entities[] = $priceEntity;
+            $entities[] = $itemEntity;
         }
 
-        $coins = new Item();
-        $coins->setName('Coins');
-        $coins->setAvgPrice(1);
-        $coins->setLowPrice(1);
-        $coins->setHighPrice(1);
-        $coins->setGameId(617);
-        $coins->setExamine('Lovely money!');
-        $entities[] = $coins;
-
         $io->info('Saving latest item price data');
-        $this->itemRepository->save($entities);
+        $this->priceRepository->save($entities);
 
-        $io->success(sprintf('Successfully added %s items and updated %s items. Skipped %s items due to errors', $inserts, $updates, $skipped));
+        $io->success(sprintf('Successfully added %s prices. Skipped %s prices due to errors', $inserts, $skipped));
 
         return Command::SUCCESS;
     }
