@@ -56,6 +56,19 @@ class Recipe
         return $this->getOutput() - $this->getGrandExchangeCut() - $this->getInput();
     }
 
+    public function getProfitColorClass(): string
+    {
+        $profit = $this->getAvgProfit();
+        if ($profit > 500000) {
+            return 'text-success';
+        }
+        if ($profit > 0) {
+            return 'text-primary';
+        }
+
+        return 'text-danger';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

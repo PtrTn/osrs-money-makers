@@ -28,7 +28,7 @@
                             <div class="col fw-bold">{{ recipe.dish.item.name }}</div>
                             <div class="col">{{ recipe.input|price }}</div>
                             <div class="col">{{ recipe.output|price }}</div>
-                            <div class="col-2">{{ recipe.avgProfit|price }}</div>
+                            <div class="col-2 {{ recipe.profitColorClass }}">{{ recipe.avgProfit|price }}</div>
                         </div>
                         <div class="row py-2 collapse bg-light" id="collapse{{ loop.index }}">
                             <div class="col">
