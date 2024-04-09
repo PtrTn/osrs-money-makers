@@ -11,6 +11,7 @@ use App\Repository\PriceRepository;
 use App\Repository\RecipeRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -40,16 +41,44 @@ class UpdatePriceHistoryCommand extends Command
 
         $io->info('Fetching recipe data from database');
         $recipes = $this->recipeRepository->findAll();
-        $gameIds = [];
+        $itemGameIds = [];
         foreach ($recipes as $recipe) {
             foreach ($recipe->getIngredients() as $ingredient) {
-                $gameIds[] = $ingredient->getItem()->getGameId();
-            }
-            $gameIds[] = $recipe->getDish()->getItem()->getGameId();
+                $itemGameIds[] = $ingredient->getItem()->getGameId();
+                         }
+            $itemGameIds[] = $recipe->getDish()->getItem()->getGameId();
         }
-        $gameIds = array_unique($gameIds);
+        $itemGameIds = array_unique($itemGameIds);
 
-        dd($gameIds);
+        $io->info(sprintf('Fetching price history for %s items', count($itemGameIds)));
+        foreach (array_slice($itemGameIds, 0, 1) as $itemGameId) {
+            $priceData = $this->httpClient->request(
+                'GET',
+                'https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=5m&id=' . $itemGameId,
+            );
+            try {
+                $pricesPerTimestamp = $priceData->toArray()['data'] ?? [];
+            } catch (Exception $exception) {
+                $this->logger->warning('Unable to fetch price history for item', ['itemGameId' => $itemGameId, 'exception' => $exception]);
+            }
+
+            $pricesForLastWeek = [];
+            foreach ($pricesPerTimestamp as $price) {
+                if (!isset($price['timestamp'], $price['avgHighPrice'], $price['avgLowPrice'])) {
+                    $this->logger->warning('Incomplete item price history data');
+                    continue;
+                }
+
+                $priceDateTime = DateTimeImmutable::createFromFormat('U', $price['timestamp']);
+                $lastWeek = new DateTimeImmutable('-1 week');
+                if ($priceDateTime > $lastWeek) {
+                    $pricesForLastWeek[] = $price['avgHighPrice'];
+                    $pricesForLastWeek[] = $price['avgLowPrice'];
+                }
+            }
+
+            dd(min($pricesForLastWeek), max($pricesForLastWeek));
+        }
         // fetch timeseries 1h interval per item
         // create Price per internal
         // save Price and Item
