@@ -1,5 +1,5 @@
 <p class="m-0">
-    <img class="me-1" src="{{ stack.image }}"/>
+    <img alt="{{ stack.item.examine }}" class="me-1" src="{{ stack.image }}"/>
     {% if not stack.item.isMoney %}
         {{ stack.quantity * recipe.throughput }} {% include 'components/item-link.html.twig' with {'item': stack.item } %}
         {% if type == 'buy' %}({{ stack.item.buyPrice }}ea){% endif %}
