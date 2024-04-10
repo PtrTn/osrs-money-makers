@@ -42,31 +42,36 @@ class UpdatePriceHistoryCommand extends Command
 
         $io->info('Fetching recipe data from database');
         $recipes = $this->recipeRepository->findAll();
-        $itemGameIds = [];
+        /** @var Item[] $itemsToUpdate */
+        $itemsToUpdate = [];
         foreach ($recipes as $recipe) {
             foreach ($recipe->getIngredients() as $ingredient) {
-                $itemGameIds[] = $ingredient->getItem()->getGameId();
+                $itemsToUpdate[] = $ingredient->getItem();
              }
-            $itemGameIds[] = $recipe->getDish()->getItem()->getGameId();
+            $itemsToUpdate[] = $recipe->getDish()->getItem();
         }
-        $itemGameIds = array_unique($itemGameIds); // todo, use Item instead of their gameids (for easier updates)
+        $itemsToUpdate = array_unique($itemsToUpdate);
+        $itemsToUpdate = array_filter($itemsToUpdate, fn (Item $item) => $item->getGameId() !== Item::COINS_GAME_ID);
 
-        $io->info(sprintf('Fetching price history for %s items', count($itemGameIds)));
-        foreach ($itemGameIds as $itemGameId) {
+        $io->info(sprintf('Fetching price history for %s items', count($itemsToUpdate)));
+        $updates = 0;
+        $skipped = 0;
+        foreach ($itemsToUpdate as $item) {
             $priceData = $this->httpClient->request(
                 'GET',
-                'https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=5m&id=' . $itemGameId,
+                'https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=5m&id=' . $item->getGameId(),
             );
             try {
                 $pricesPerTimestamp = $priceData->toArray()['data'] ?? [];
             } catch (Exception $exception) {
-                $this->logger->warning('Unable to fetch price history for item', ['itemGameId' => $itemGameId, 'exception' => $exception]);
+                $this->logger->warning('Unable to fetch price history for item', ['itemGameId' => $item->getGameId(), 'exception' => $exception]);
+                $skipped++;
             }
 
             $pricesForLastWeek = [];
             foreach ($pricesPerTimestamp as $price) {
                 if (!isset($price['timestamp'], $price['avgHighPrice'], $price['avgLowPrice'])) {
-                    $this->logger->warning('Incomplete item price history data', ['itemGameId' => $itemGameId, 'data' => $price]);
+                    $this->logger->warning('Incomplete item price history data', ['itemGameId' => $item->getGameId(), 'data' => $price]);
                     continue;
                 }
 
@@ -79,17 +84,20 @@ class UpdatePriceHistoryCommand extends Command
             }
 
             if (count($pricesForLastWeek) === 0) {
-                $this->logger->info('No item price history data for last week', ['itemGameId' => $itemGameId]);
+                $this->logger->info('No item price history data for last week', ['itemGameId' => $item->getGameId()]);
+                $skipped++;
                 continue;
             }
 
-            $item = $this->itemRepository->findOneBy(['gameId' => $itemGameId]);
             $price = $item->getPrice();
             $price->setHistoricHigh(max($pricesForLastWeek));
             $price->setHistoricLow(min($pricesForLastWeek));
 
             $this->itemRepository->save([$item]);
+            $updates++;
         }
+
+        $io->success(sprintf('Successfully updated %s historic prices. Skipped %s prices due to errors', $updates, $skipped));
 
         // todo, use historical data in FE
 

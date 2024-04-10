@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
 class Item
 {
-    private const COINS_GAME_ID = 617;
+    public const COINS_GAME_ID = 617;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,7 +24,7 @@ class Item
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $examine = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'], fetch: 'EAGER')]
     private ?Price $price = null;
 
     public function __toString(): string
