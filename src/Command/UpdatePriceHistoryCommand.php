@@ -68,7 +68,8 @@ class UpdatePriceHistoryCommand extends Command
                 $skipped++;
             }
 
-            $pricesForLastWeek = [];
+            $highPricesForLastWeek = [];
+            $lowPricesForLastWeek = [];
             foreach ($pricesPerTimestamp as $price) {
                 if (!isset($price['timestamp'], $price['avgHighPrice'], $price['avgLowPrice'])) {
                     $this->logger->warning('Incomplete item price history data', ['itemGameId' => $item->getGameId(), 'data' => $price]);
@@ -78,28 +79,28 @@ class UpdatePriceHistoryCommand extends Command
                 $priceDateTime = DateTimeImmutable::createFromFormat('U', $price['timestamp']);
                 $lastWeek = new DateTimeImmutable('-1 week');
                 if ($priceDateTime > $lastWeek) {
-                    $pricesForLastWeek[] = $price['avgHighPrice'];
-                    $pricesForLastWeek[] = $price['avgLowPrice'];
+                    $highPricesForLastWeek[] = $price['avgHighPrice'];
+                    $lowPricesForLastWeek[] = $price['avgLowPrice'];
                 }
             }
 
-            if (count($pricesForLastWeek) === 0) {
+            if (count($highPricesForLastWeek) === 0 || count($lowPricesForLastWeek) === 0) {
                 $this->logger->info('No item price history data for last week', ['itemGameId' => $item->getGameId()]);
                 $skipped++;
                 continue;
             }
 
             $price = $item->getPrice();
-            $price->setHistoricHigh(max($pricesForLastWeek));
-            $price->setHistoricLow(min($pricesForLastWeek));
+            $price->setMaxHigh(max($highPricesForLastWeek));
+            $price->setMinHigh(min($highPricesForLastWeek));
+            $price->setMaxLow(max($lowPricesForLastWeek));
+            $price->setMinLow(min($lowPricesForLastWeek));
 
             $this->itemRepository->save([$item]);
             $updates++;
         }
 
         $io->success(sprintf('Successfully updated %s historic prices. Skipped %s prices due to errors', $updates, $skipped));
-
-        // todo, use historical data in FE
 
         // todo, add volume data for low-volume warning
 

@@ -2,8 +2,8 @@
     <img alt="{{ stack.item.examine }}" class="me-1" src="{{ stack.image }}"/>
     {% if not stack.item.isMoney %}
         {{ stack.quantity * recipe.throughput }} {% include 'components/item-link.html.twig' with {'item': stack.item } %}
-        {% if type == 'buy' %}({{ stack.item.buyPrice }}ea){% endif %}
-        {% if type == 'sell' %}({{ stack.item.sellPrice }}ea){% endif %}
+        {% if type == 'buy' %}(<span class="{{ stack.item.price.buyPriceStatus }}">{{ stack.item.buyPrice }}ea</span>){% endif %}
+        {% if type == 'sell' %}(<span class="{{ stack.item.price.sellPriceStatus }}">{{ stack.item.sellPrice }}ea</span>){% endif %}
     {% else %}
         {{ (stack.quantity * recipe.throughput)|price(2) }} {{ stack.item.name }} ({{ stack.quantity }}ea)
     {% endif %}

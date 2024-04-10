@@ -20,10 +20,58 @@ class Price
     private ?int $low = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $historicHigh = null;
+    private ?int $minHigh = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $historicLow = null;
+    private ?int $maxHigh = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $minLow = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $maxLow = null;
+
+    public function getSellPrice(): ?int
+    {
+        return $this->getLow();
+    }
+
+    public function getBuyPrice(): ?int
+    {
+        return $this->getHigh();
+    }
+
+    public function getSellPriceStatus(): string
+    {
+        $range = $this->getMaxLow() - $this->getMinLow();
+        $goodThreshold = $this->getMaxLow() - $range * 0.3;
+        $badThreshold = $this->getMinLow() + $range * 0.3;
+
+        if ($this->getLow() > $goodThreshold) {
+            return 'text-success';
+        }
+        if ($this->getLow() < $badThreshold) {
+            return 'text-danger';
+        }
+
+        return '';
+    }
+
+    public function getBuyPriceStatus(): string
+    {
+        $range = $this->getMaxHigh() - $this->getMinHigh();
+        $badThreshold = $this->getMaxHigh() - $range * 0.3;
+        $goodThreshold = $this->getMinHigh() + $range * 0.3;
+
+        if ($this->getHigh() < $goodThreshold) {
+            return 'text-success';
+        }
+        if ($this->getHigh() > $badThreshold) {
+            return 'text-danger';
+        }
+
+        return '';
+    }
 
     public function getId(): ?int
     {
@@ -54,26 +102,50 @@ class Price
         return $this;
     }
 
-    public function getHistoricHigh(): ?int
+    public function getMinHigh(): ?int
     {
-        return $this->historicHigh;
+        return $this->minHigh;
     }
 
-    public function setHistoricHigh(?int $historicHigh): static
+    public function setMinHigh(?int $minHigh): static
     {
-        $this->historicHigh = $historicHigh;
+        $this->minHigh = $minHigh;
 
         return $this;
     }
 
-    public function getHistoricLow(): ?int
+    public function getMaxHigh(): ?int
     {
-        return $this->historicLow;
+        return $this->maxHigh;
     }
 
-    public function setHistoricLow(?int $historicLow): static
+    public function setMaxHigh(?int $maxHigh): static
     {
-        $this->historicLow = $historicLow;
+        $this->maxHigh = $maxHigh;
+
+        return $this;
+    }
+
+    public function getMinLow(): ?int
+    {
+        return $this->minLow;
+    }
+
+    public function setMinLow(?int $minLow): static
+    {
+        $this->minLow = $minLow;
+
+        return $this;
+    }
+
+    public function getMaxLow(): ?int
+    {
+        return $this->maxLow;
+    }
+
+    public function setMaxLow(?int $maxLow): static
+    {
+        $this->maxLow = $maxLow;
 
         return $this;
     }
