@@ -59,7 +59,7 @@ class UpdatePriceHistoryCommand extends Command
         foreach ($itemsToUpdate as $item) {
             $priceData = $this->httpClient->request(
                 'GET',
-                'https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=5m&id=' . $item->getGameId(),
+                'https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=1h&id=' . $item->getGameId(),
             );
             try {
                 $pricesPerTimestamp = $priceData->toArray()['data'] ?? [];
