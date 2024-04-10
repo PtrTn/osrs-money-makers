@@ -78,6 +78,8 @@ class UpdatePricesCommand extends Command
         $io->info('Saving latest item price data');
         $this->priceRepository->save($entities);
 
+        // todo, save last update date (and show with time ago)
+
         $io->success(sprintf('Successfully added %s prices. Skipped %s prices due to errors', $inserts, $skipped));
 
         return Command::SUCCESS;

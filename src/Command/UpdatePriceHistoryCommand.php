@@ -84,7 +84,7 @@ class UpdatePriceHistoryCommand extends Command
             }
 
             $item = $this->itemRepository->findOneBy(['gameId' => $itemGameId]);
-            $price = $item->getPrices()->first();
+            $price = $item->getPrices()->first(); // todo, this will only update the most recent price. That will be gone after a current price update
             $price->setHistoricHigh(max($pricesForLastWeek));
             $price->setHistoricLow(min($pricesForLastWeek));
 
