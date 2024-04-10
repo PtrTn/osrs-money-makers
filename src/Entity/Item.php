@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
@@ -26,34 +24,22 @@ class Item
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $examine = null;
 
-    #[ORM\ManyToMany(targetEntity: Price::class, inversedBy: 'item')]
-    #[ORM\OrderBy(['date' => 'DESC'])]
-    private Collection $prices;
-
-    public function __construct()
-    {
-        $this->prices = new ArrayCollection();
-    }
-
-    public function getSellPrice(): int
-    {
-        /** @var Price $mostRecentPrice */
-        $mostRecentPrice = $this->prices->first();
-
-        return $mostRecentPrice->getLow();
-    }
-
-    public function getBuyPrice(): int
-    {
-        /** @var Price $mostRecentPrice */
-        $mostRecentPrice = $this->prices->first();
-
-        return $mostRecentPrice->getHigh();
-    }
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Price $price = null;
 
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function getSellPrice(): ?int
+    {
+        return $this->price?->getLow();
+    }
+
+    public function getBuyPrice(): ?int
+    {
+        return $this->price?->getHigh();
     }
 
     public function isMoney(): bool
@@ -102,26 +88,14 @@ class Item
         return $this;
     }
 
-    /**
-     * @return Collection<int, Price>
-     */
-    public function getPrices(): Collection
+    public function getPrice(): ?Price
     {
-        return $this->prices;
+        return $this->price;
     }
 
-    public function addPrice(Price $price): static
+    public function setPrice(?Price $price): static
     {
-        if (!$this->prices->contains($price)) {
-            $this->prices->add($price);
-        }
-
-        return $this;
-    }
-
-    public function removePrice(Price $price): static
-    {
-        $this->prices->removeElement($price);
+        $this->price = $price;
 
         return $this;
     }

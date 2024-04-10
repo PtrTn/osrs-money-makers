@@ -49,7 +49,7 @@ class UpdatePriceHistoryCommand extends Command
              }
             $itemGameIds[] = $recipe->getDish()->getItem()->getGameId();
         }
-        $itemGameIds = array_unique($itemGameIds);
+        $itemGameIds = array_unique($itemGameIds); // todo, use Item instead of their gameids (for easier updates)
 
         $io->info(sprintf('Fetching price history for %s items', count($itemGameIds)));
         foreach ($itemGameIds as $itemGameId) {
@@ -84,16 +84,12 @@ class UpdatePriceHistoryCommand extends Command
             }
 
             $item = $this->itemRepository->findOneBy(['gameId' => $itemGameId]);
-            $price = $item->getPrices()->first(); // todo, this will only update the most recent price. That will be gone after a current price update
+            $price = $item->getPrice();
             $price->setHistoricHigh(max($pricesForLastWeek));
             $price->setHistoricLow(min($pricesForLastWeek));
 
             $this->itemRepository->save([$item]);
         }
-        // fetch timeseries 1h interval per item
-        // create Price per internal
-        // save Price and Item
-
 
         // todo, use historical data in FE
 

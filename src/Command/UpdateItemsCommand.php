@@ -78,7 +78,7 @@ class UpdateItemsCommand extends Command
             $entities[] = $coins;
         }
 
-        $io->info('Saving latest item price data');
+        $io->info('Saving latest item data');
         $this->itemRepository->save($entities);
 
         $io->success(sprintf('Successfully added %s items and updated %s items. Skipped %s items due to errors', $inserts, $updates, $skipped));

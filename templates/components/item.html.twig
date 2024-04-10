@@ -5,6 +5,6 @@
         {% if type == 'buy' %}({{ stack.item.buyPrice }}ea){% endif %}
         {% if type == 'sell' %}({{ stack.item.sellPrice }}ea){% endif %}
     {% else %}
-        {{ (stack.quantity * recipe.throughput)|price(2) }} <a href="/">{{ stack.item.name }}</a> ({{ stack.quantity }}ea)
+        {{ (stack.quantity * recipe.throughput)|price(2) }} {{ stack.item.name }} ({{ stack.quantity }}ea)
     {% endif %}
 </p>

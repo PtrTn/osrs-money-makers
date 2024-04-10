@@ -46,6 +46,7 @@ class UpdatePricesCommand extends Command
         $itemsFromDatabase = $this->itemRepository->findAllAsCollection();
 
         $inserts = 0;
+        $updates = 0;
         $skipped = 0;
         $entities = [];
         foreach ($pricesFromApi as $itemGameId => $price) {
@@ -64,14 +65,18 @@ class UpdatePricesCommand extends Command
                 continue;
             }
 
-            $priceEntity = new Price();
+            $priceEntity = $itemEntity->getPrice();
+            if ($priceEntity === null) {
+                $inserts++;
+                $priceEntity = new Price();
+            }
+            else {
+                $updates++;
+            }
             $priceEntity->setHigh($highPrice);
             $priceEntity->setLow($lowPrice);
-            $priceEntity->setDate(new DateTimeImmutable('now'));
-            $priceEntity->addItem($itemEntity);
-            $inserts++;
+            $itemEntity->setPrice($priceEntity);
 
-            $entities[] = $priceEntity;
             $entities[] = $itemEntity;
         }
 
@@ -80,7 +85,7 @@ class UpdatePricesCommand extends Command
 
         // todo, save last update date (and show with time ago)
 
-        $io->success(sprintf('Successfully added %s prices. Skipped %s prices due to errors', $inserts, $skipped));
+        $io->success(sprintf('Successfully added %s prices and updated %s prices. Skipped %s prices due to errors', $inserts, $updates, $skipped));
 
         return Command::SUCCESS;
     }

@@ -42,7 +42,7 @@ class ItemFixtures extends Fixture
         $item->setGameId($gameId);
         $item->setName($name);
         $item->setExamine(null);
-        $item->addPrice($price);
+        $item->setPrice($price);
 
         $this->addReference($name, $item);
 
