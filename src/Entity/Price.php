@@ -22,6 +22,12 @@ class Price
     #[ORM\Column(nullable: true)]
     private ?int $low = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $historicHigh = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $historicLow = null;
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeInterface $date = null;
 
@@ -97,6 +103,30 @@ class Price
         if ($this->items->removeElement($item)) {
             $item->removePrice($this);
         }
+
+        return $this;
+    }
+
+    public function getHistoricHigh(): ?int
+    {
+        return $this->historicHigh;
+    }
+
+    public function setHistoricHigh(?int $historicHigh): static
+    {
+        $this->historicHigh = $historicHigh;
+
+        return $this;
+    }
+
+    public function getHistoricLow(): ?int
+    {
+        return $this->historicLow;
+    }
+
+    public function setHistoricLow(?int $historicLow): static
+    {
+        $this->historicLow = $historicLow;
 
         return $this;
     }

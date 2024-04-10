@@ -29,7 +29,8 @@ class UpdatePriceHistoryCommand extends Command
     public function __construct(
         private HttpClientInterface $httpClient,
         private RecipeRepository $recipeRepository,
-        private LoggerInterface     $logger
+        private ItemRepository $itemRepository,
+        private LoggerInterface $logger
     )
     {
         parent::__construct();
@@ -45,13 +46,13 @@ class UpdatePriceHistoryCommand extends Command
         foreach ($recipes as $recipe) {
             foreach ($recipe->getIngredients() as $ingredient) {
                 $itemGameIds[] = $ingredient->getItem()->getGameId();
-                         }
+             }
             $itemGameIds[] = $recipe->getDish()->getItem()->getGameId();
         }
         $itemGameIds = array_unique($itemGameIds);
 
         $io->info(sprintf('Fetching price history for %s items', count($itemGameIds)));
-        foreach (array_slice($itemGameIds, 0, 1) as $itemGameId) {
+        foreach ($itemGameIds as $itemGameId) {
             $priceData = $this->httpClient->request(
                 'GET',
                 'https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=5m&id=' . $itemGameId,
@@ -65,7 +66,7 @@ class UpdatePriceHistoryCommand extends Command
             $pricesForLastWeek = [];
             foreach ($pricesPerTimestamp as $price) {
                 if (!isset($price['timestamp'], $price['avgHighPrice'], $price['avgLowPrice'])) {
-                    $this->logger->warning('Incomplete item price history data');
+                    $this->logger->warning('Incomplete item price history data', ['itemGameId' => $itemGameId, 'data' => $price]);
                     continue;
                 }
 
@@ -77,7 +78,17 @@ class UpdatePriceHistoryCommand extends Command
                 }
             }
 
-            dd(min($pricesForLastWeek), max($pricesForLastWeek));
+            if (count($pricesForLastWeek) === 0) {
+                $this->logger->info('No item price history data for last week', ['itemGameId' => $itemGameId]);
+                continue;
+            }
+
+            $item = $this->itemRepository->findOneBy(['gameId' => $itemGameId]);
+            $price = $item->getPrices()->first();
+            $price->setHistoricHigh(max($pricesForLastWeek));
+            $price->setHistoricLow(min($pricesForLastWeek));
+
+            $this->itemRepository->save([$item]);
         }
         // fetch timeseries 1h interval per item
         // create Price per internal
@@ -85,6 +96,8 @@ class UpdatePriceHistoryCommand extends Command
 
 
         // todo, use historical data in FE
+
+        // todo, add volume data for low-volume warning
 
         return Command::SUCCESS;
     }
