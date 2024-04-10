@@ -43,6 +43,9 @@ class Price
 
     public function getSellPriceStatus(): string
     {
+        if ($this->getMaxLow() === null || $this->getMinLow() === null) {
+            return '';
+        }
         $range = $this->getMaxLow() - $this->getMinLow();
         $goodThreshold = $this->getMaxLow() - $range * 0.3;
         $badThreshold = $this->getMinLow() + $range * 0.3;
@@ -59,6 +62,9 @@ class Price
 
     public function getBuyPriceStatus(): string
     {
+        if ($this->getMaxHigh() === null || $this->getMinHigh() === null) {
+            return '';
+        }
         $range = $this->getMaxHigh() - $this->getMinHigh();
         $badThreshold = $this->getMaxHigh() - $range * 0.3;
         $goodThreshold = $this->getMinHigh() + $range * 0.3;

@@ -17,6 +17,7 @@ class PriceTests extends TestCase
 
         $this->assertSame('', $price->getBuyPriceStatus());
     }
+
     /**  @test */
     public function shouldCalculateSellPrice(): void
     {

@@ -96,9 +96,10 @@ class UpdatePriceHistoryCommand extends Command
             $price->setMaxLow(max($lowPricesForLastWeek));
             $price->setMinLow(min($lowPricesForLastWeek));
 
-            $this->itemRepository->save([$item]);
             $updates++;
         }
+
+        $this->itemRepository->save($itemsToUpdate);
 
         $io->success(sprintf('Successfully updated %s historic prices. Skipped %s prices due to errors', $updates, $skipped));
 
