@@ -82,7 +82,8 @@ class Recipe
         $warnings = [];
 
         $requiredDishVolume = $this->dish->getQuantity() * $this->throughput;
-        if ($requiredDishVolume > $this->dish->getItem()->getPrice()->getSellVolume() * self::VOLUME_WARNING_PERCENTAGE) {
+        $dishVolume = $this->dish->getItem()->getPrice()->getSellVolume();
+        if ($dishVolume !== null && $requiredDishVolume > $dishVolume * self::VOLUME_WARNING_PERCENTAGE) {
             $warnings[] = $this->dish->getItem();
         }
         foreach ($this->ingredients as $ingredient) {
@@ -90,8 +91,9 @@ class Recipe
                 continue;
             }
             $requiredIngredientVolume = $ingredient->getQuantity() * $this->throughput;
-            if ($requiredIngredientVolume > $ingredient->getItem()->getPrice()->getBuyVolume() * self::VOLUME_WARNING_PERCENTAGE) {
-                $warnings[] = $ingredient;
+            $ingredientVolume = $ingredient->getItem()->getPrice()->getBuyVolume();
+            if ($ingredientVolume !== null && $requiredIngredientVolume > $ingredientVolume * self::VOLUME_WARNING_PERCENTAGE) {
+                $warnings[] = $ingredient->getItem();
             }
         }
 
