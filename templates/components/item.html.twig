@@ -5,16 +5,22 @@
         {% if type == 'buy' %}
             <span
                 class="{{ stack.item.price.buyPriceStatus }}"
-                data-bs-toggle="tooltip"
-                data-bs-title="Bought {{ stack.item.price.buyVolume|price }} times for prices between {{ stack.item.price.lowestBuyPrice }}ea and {{ stack.item.price.highestBuyPrice }}ea in the last week">
+                {% if stack.item.price.hasHistoricData %}
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Bought {{ stack.item.price.buyVolume|price }} times for prices between {{ stack.item.price.lowestBuyPrice }}ea and {{ stack.item.price.highestBuyPrice }}ea in the last week"
+                {% endif %}
+                >
                 {{ stack.item.buyPrice }}ea
             </span>
         {% endif %}
         {% if type == 'sell' %}
             <span
                 class="{{ stack.item.price.sellPriceStatus }}"
-                data-bs-toggle="tooltip"
-                data-bs-title="Sold {{ stack.item.price.sellVolume|price }} times for prices between {{ stack.item.price.lowestSellPrice }}ea and {{ stack.item.price.highestSellPrice }}ea in the last week">
+                {% if stack.item.price.hasHistoricData %}
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Sold {{ stack.item.price.sellVolume|price }} times for prices between {{ stack.item.price.lowestSellPrice }}ea and {{ stack.item.price.highestSellPrice }}ea in the last week"
+                {% endif %}
+                >
                 {{ stack.item.sellPrice }}ea
             </span>
         {% endif %}

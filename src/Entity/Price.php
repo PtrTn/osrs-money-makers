@@ -47,6 +47,20 @@ class Price
         return $this->getHigh();
     }
 
+    public function hasHistoricData(): bool
+    {
+        $data = [
+            $this->getBuyVolume(),
+            $this->getSellVolume(),
+            $this->getMinHigh(),
+            $this->getMinHigh(),
+            $this->getMinLow(),
+            $this->getMaxLow()
+        ];
+
+        return count(array_filter($data)) === 6;
+    }
+
     public function getLowestBuyPrice(): ?int
     {
         return $this->getMinHigh();
