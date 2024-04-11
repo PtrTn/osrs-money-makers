@@ -2,15 +2,11 @@
 
 namespace App\Command;
 
+use App\Calculation\DataSmoother;
 use App\Entity\Item;
-use App\Entity\Price;
-use App\Entity\Recipe;
-use App\Entity\Stack;
 use App\Repository\ItemRepository;
-use App\Repository\PriceRepository;
 use App\Repository\RecipeRepository;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -30,7 +26,8 @@ class UpdatePriceHistoryCommand extends Command
         private HttpClientInterface $httpClient,
         private RecipeRepository $recipeRepository,
         private ItemRepository $itemRepository,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private DataSmoother $dataSmoother,
     )
     {
         parent::__construct();
@@ -77,7 +74,7 @@ class UpdatePriceHistoryCommand extends Command
                 }
 
                 $priceDateTime = DateTimeImmutable::createFromFormat('U', $price['timestamp']);
-                $lastWeek = new DateTimeImmutable('-1 week');
+                $lastWeek = new DateTimeImmutable('-8 days');
                 if ($priceDateTime > $lastWeek) {
                     $highPricesForLastWeek[] = $price['avgHighPrice'];
                     $lowPricesForLastWeek[] = $price['avgLowPrice'];
@@ -89,6 +86,9 @@ class UpdatePriceHistoryCommand extends Command
                 $skipped++;
                 continue;
             }
+
+            $highPricesForLastWeek = $this->dataSmoother->smooth($highPricesForLastWeek);
+            $lowPricesForLastWeek = $this->dataSmoother->smooth($lowPricesForLastWeek);
 
             $price = $item->getPrice();
             $price->setMaxHigh(max($highPricesForLastWeek));
