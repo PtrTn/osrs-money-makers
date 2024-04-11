@@ -71,6 +71,27 @@ class Recipe
         return '';
     }
 
+    public function hasPriceFluctuationWarning(): bool
+    {
+        return count($this->getItemsWithPriceFluctuationWarning()) > 0;
+    }
+
+    /** @return Item[] */
+    public function getItemsWithPriceFluctuationWarning(): array
+    {
+        $warnings = [];
+        if ($this->dish->getItem()->getPrice()->hasFluctuatingSellPrice()) {
+            $warnings[] = $this->dish->getItem();
+        }
+        foreach ($this->ingredients as $ingredient) {
+            if ($ingredient->getItem()->getPrice()->hasFluctuatingBuyPrice()) {
+                $warnings[] = $ingredient->getItem();
+            }
+        }
+
+        return $warnings;
+    }
+
     public function hasVolumeWarning(): bool
     {
         return count($this->getItemsWithVolumeWarning()) > 0;

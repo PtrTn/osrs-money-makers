@@ -47,6 +47,20 @@ class Price
         return $this->getHigh();
     }
 
+    public function hasFluctuatingBuyPrice(): bool
+    {
+        $fluctuation = $this->getHighestBuyPrice() - $this->getLowestBuyPrice();
+        
+        return $fluctuation > $this->getLowestBuyPrice() * 0.3;
+    }
+
+    public function hasFluctuatingSellPrice(): bool
+    {
+        $fluctuation = $this->getHighestSellPrice() - $this->getLowestSellPrice();
+        
+        return $fluctuation > $this->getLowestSellPrice() * 0.3;
+    }
+
     public function hasHistoricData(): bool
     {
         $data = [
