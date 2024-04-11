@@ -7,4 +7,8 @@ import './bootstrap.js';
  */
 import './styles/app.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Collapse } from 'bootstrap';
+
+import * as bootstrap from 'bootstrap';
+
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
