@@ -15,6 +15,7 @@ class RecipeFixtures extends Fixture implements DependentFixtureInterface
         $recipes[] = $this->createRecipe(['Jute fibre' => 2], 'Drift net', 1, 1100);
         $recipes[] = $this->createRecipe(['Soft clay' => 1, 'Law rune' => 1], 'Varrock teleport (tablet)', 1, 1100);
         $recipes[] = $this->createRecipe(['Soft clay' => 1, 'Law rune' => 1], 'Teleport to house (tablet)', 1, 1100);
+        $recipes[] = $this->createRecipe(['Soft clay' => 1, 'Law rune' => 3, 'Astral rune' =>  3], 'Catherby teleport (tablet)', 1, 1100);
         $recipes[] = $this->createRecipe(['Steel bar' => 1], 'Cannonball', 4, 1080);
         $recipes[] = $this->createRecipe(
             [
@@ -37,6 +38,43 @@ class RecipeFixtures extends Fixture implements DependentFixtureInterface
             10,
             5500
         );
+        $recipes[] = $this->createRecipe(
+            [
+                'Dragonstone' => 1,
+                'Gold bar' => 1,
+            ],
+            'Dragonstone bracelet',
+            1,
+            1200
+        );
+        $recipes[] = $this->createRecipe(
+            [
+                'Dragonstone bracelet' => 1,
+                'Cosmic rune' => 1,
+            ],
+            'Combat bracelet',
+            1,
+            1600
+        );
+        $recipes[] = $this->createRecipe(
+            [
+                'Clockwork' => 1,
+                'Yew logs' => 1,
+            ],
+            'Yew bird house',
+            1,
+            2500
+        );
+        $recipes[] = $this->createRecipe(
+            [
+                'Clockwork' => 1,
+                'Mahogany logs' => 1,
+            ],
+            'Mahogany bird house',
+            1,
+            2500
+        );
+
         foreach ($recipes as $recipe) {
             $manager->persist($recipe);
         }

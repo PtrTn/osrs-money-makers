@@ -28,6 +28,16 @@ class ItemFixtures extends Fixture
         $this->createItem($manager, 564, 'Cosmic rune', 86);
         $this->createItem($manager, 565, 'Blood rune', 234);
         $this->createItem($manager, 21944, 'Ruby dragon bolts (e)', 934);
+        $this->createItem($manager, 24961, 'Catherby teleport (tablet)', 2499);
+        $this->createItem($manager, 22198, 'Yew bird house', 1187);
+        $this->createItem($manager, 22195, 'Mahogany bird house', 1429);
+        $this->createItem($manager, 8792, 'Clockwork', 880);
+        $this->createItem($manager, 1615, 'Dragonstone', 11283);
+        $this->createItem($manager, 11115, 'Dragonstone bracelet', 11750);
+        $this->createItem($manager, 11126, 'Combat bracelet', 12380);
+        $this->createItem($manager, 11118, 'Combat bracelet(4)', 11118);
+        $this->createItem($manager, 2357, 'Gold bar', 109);
+        $this->createItem($manager, 1515, 'Yew logs', 222);
 
         $manager->flush();
     }
