@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
 class Item
 {
-    public const COINS_GAME_ID = 617;
+    private const COINS_GAME_ID = 617;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

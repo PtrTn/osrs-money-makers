@@ -49,7 +49,7 @@ class UpdatePriceHistoryCommand extends Command
             $itemsToUpdate[] = $recipe->getDish()->getItem();
         }
         $itemsToUpdate = array_unique($itemsToUpdate);
-        $itemsToUpdate = array_filter($itemsToUpdate, fn (Item $item) => $item->getGameId() !== Item::COINS_GAME_ID);
+        $itemsToUpdate = array_filter($itemsToUpdate, fn (Item $item) => !$item->isMoney());
 
         $io->info(sprintf('Fetching price history for %s items', count($itemsToUpdate)));
         $updates = 0;

@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
 {
+    private const VOLUME_WARNING_PERCENTAGE = 0.01;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -62,11 +64,38 @@ class Recipe
         if ($profit > 500000) {
             return 'text-success';
         }
-        if ($profit > 0) {
-            return 'text-primary';
+        if ($profit < 0) {
+            return 'text-danger';
         }
 
-        return 'text-danger';
+        return '';
+    }
+
+    public function hasVolumeWarning(): bool
+    {
+        return count($this->getItemsWithVolumeWarning()) > 0;
+    }
+
+    /** @return Item[] */
+    public function getItemsWithVolumeWarning(): array
+    {
+        $warnings = [];
+
+        $requiredDishVolume = $this->dish->getQuantity() * $this->throughput;
+        if ($requiredDishVolume > $this->dish->getItem()->getPrice()->getSellVolume() * self::VOLUME_WARNING_PERCENTAGE) {
+            $warnings[] = $this->dish->getItem();
+        }
+        foreach ($this->ingredients as $ingredient) {
+            if ($ingredient->getItem()->isMoney()) {
+                continue;
+            }
+            $requiredIngredientVolume = $ingredient->getQuantity() * $this->throughput;
+            if ($requiredIngredientVolume > $ingredient->getItem()->getPrice()->getBuyVolume() * self::VOLUME_WARNING_PERCENTAGE) {
+                $warnings[] = $ingredient;
+            }
+        }
+
+        return $warnings;
     }
 
     public function getId(): ?int

@@ -28,7 +28,20 @@
                             <div class="col fw-bold">{{ recipe.dish.item.name }}</div>
                             <div class="col">{{ recipe.input|price }}</div>
                             <div class="col">{{ recipe.output|price }}</div>
-                            <div class="col-2 {{ recipe.profitColorClass }}">{{ recipe.avgProfit|price }}</div>
+                            <div class="col-2">
+                                <span class="{{ recipe.profitColorClass }}">{{ recipe.avgProfit|price }}</span>
+                                {% if recipe.hasVolumeWarning %}
+                                    <i class="bi bi-exclamation-circle text-danger"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-html="true"
+                                       {% if recipe.itemsWithVolumeWarning|length > 1 %}
+                                            data-bs-title="These item(s) have low volumes:<br> {{ recipe.itemsWithVolumeWarning|join("<br>") }}"
+                                       {% else %}
+                                            data-bs-title="This item has a low volume:<br> {{ recipe.itemsWithVolumeWarning|join("<br>") }}"
+                                       {% endif %}
+                                    ></i>
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="row py-2 collapse bg-light" id="collapse{{ loop.index }}">
                             <div class="col">
