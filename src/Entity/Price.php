@@ -31,6 +31,12 @@ class Price
     #[ORM\Column(nullable: true)]
     private ?int $maxLow = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $highVolume = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $lowVolume = null;
+
     public function getSellPrice(): ?int
     {
         return $this->getLow();
@@ -59,6 +65,16 @@ class Price
     public function getHighestSellPrice(): ?int
     {
         return $this->getMaxLow();
+    }
+
+    public function getBuyVolume(): ?int
+    {
+        return $this->getHighVolume();
+    }
+
+    public function getSellVolume(): ?int
+    {
+        return $this->getLowVolume();
     }
 
     public function getSellPriceStatus(): string
@@ -172,6 +188,30 @@ class Price
     public function setMaxLow(?int $maxLow): static
     {
         $this->maxLow = $maxLow;
+
+        return $this;
+    }
+
+    public function getHighVolume(): ?int
+    {
+        return $this->highVolume;
+    }
+
+    public function setHighVolume(?int $highVolume): static
+    {
+        $this->highVolume = $highVolume;
+
+        return $this;
+    }
+
+    public function getLowVolume(): ?int
+    {
+        return $this->lowVolume;
+    }
+
+    public function setLowVolume(?int $lowVolume): static
+    {
+        $this->lowVolume = $lowVolume;
 
         return $this;
     }

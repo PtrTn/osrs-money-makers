@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240410204943 extends AbstractMigration
+final class Version20240411140451 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20240410204943 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE item (id INT AUTO_INCREMENT NOT NULL, price_id INT DEFAULT NULL, game_id INT NOT NULL, name VARCHAR(255) NOT NULL, examine VARCHAR(255) DEFAULT NULL, UNIQUE INDEX UNIQ_1F1B251ED614C7E7 (price_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE price (id INT AUTO_INCREMENT NOT NULL, high INT DEFAULT NULL, low INT DEFAULT NULL, historic_high INT DEFAULT NULL, historic_low INT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE price (id INT AUTO_INCREMENT NOT NULL, high INT DEFAULT NULL, low INT DEFAULT NULL, min_high INT DEFAULT NULL, max_high INT DEFAULT NULL, min_low INT DEFAULT NULL, max_low INT DEFAULT NULL, high_volume INT DEFAULT NULL, low_volume INT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE recipe (id INT AUTO_INCREMENT NOT NULL, dish_id INT NOT NULL, throughput INT NOT NULL, INDEX IDX_DA88B137148EB0CB (dish_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE recipe_stack (recipe_id INT NOT NULL, stack_id INT NOT NULL, INDEX IDX_57BBAF7559D8A214 (recipe_id), INDEX IDX_57BBAF7537C70060 (stack_id), PRIMARY KEY(recipe_id, stack_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE stack (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, quantity INT NOT NULL, INDEX IDX_41A87B6A126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');

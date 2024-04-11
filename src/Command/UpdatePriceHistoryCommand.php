@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Throwable;
 
 #[AsCommand(
     name: 'app:update:history',
@@ -60,15 +61,18 @@ class UpdatePriceHistoryCommand extends Command
             );
             try {
                 $pricesPerTimestamp = $priceData->toArray()['data'] ?? [];
-            } catch (Exception $exception) {
+            } catch (Exception | Throwable $exception) {
                 $this->logger->warning('Unable to fetch price history for item', ['itemGameId' => $item->getGameId(), 'exception' => $exception]);
                 $skipped++;
+                continue;
             }
 
             $highPricesForLastWeek = [];
             $lowPricesForLastWeek = [];
+            $highVolumeForLastWeek = [];
+            $lowVolumeForLastWeek = [];
             foreach ($pricesPerTimestamp as $price) {
-                if (!isset($price['timestamp'], $price['avgHighPrice'], $price['avgLowPrice'])) {
+                if (!isset($price['timestamp'], $price['avgHighPrice'], $price['avgLowPrice'], $price['highPriceVolume'], $price['lowPriceVolume'])) {
                     $this->logger->warning('Incomplete item price history data', ['itemGameId' => $item->getGameId(), 'data' => $price]);
                     continue;
                 }
@@ -78,6 +82,8 @@ class UpdatePriceHistoryCommand extends Command
                 if ($priceDateTime > $lastWeek) {
                     $highPricesForLastWeek[] = $price['avgHighPrice'];
                     $lowPricesForLastWeek[] = $price['avgLowPrice'];
+                    $highVolumeForLastWeek[] = $price['highPriceVolume'];
+                    $lowVolumeForLastWeek[] = $price['lowPriceVolume'];
                 }
             }
 
@@ -95,6 +101,8 @@ class UpdatePriceHistoryCommand extends Command
             $price->setMinHigh(min($highPricesForLastWeek));
             $price->setMaxLow(max($lowPricesForLastWeek));
             $price->setMinLow(min($lowPricesForLastWeek));
+            $price->setHighVolume(array_sum($highVolumeForLastWeek));
+            $price->setLowVolume(array_sum($lowVolumeForLastWeek));
 
             $updates++;
         }
@@ -102,8 +110,6 @@ class UpdatePriceHistoryCommand extends Command
         $this->itemRepository->save($itemsToUpdate);
 
         $io->success(sprintf('Successfully updated %s historic prices. Skipped %s prices due to errors', $updates, $skipped));
-
-        // todo, add volume data for low-volume warning
 
         return Command::SUCCESS;
     }

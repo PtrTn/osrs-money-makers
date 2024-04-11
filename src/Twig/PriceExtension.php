@@ -14,8 +14,11 @@ class PriceExtension extends AbstractExtension
         ];
     }
 
-    public function formatPrice(float $number, int $decimals = 1): string
+    public function formatPrice(?float $number, int $decimals = 1): string
     {
+        if ($number === null) {
+            return '';
+        }
         if ($number > 1000000 || $number < -1000000) {
             return round($number / 1000000, $decimals) . 'm';
         }

@@ -3,20 +3,20 @@
     {% if not stack.item.isMoney %}
         {{ stack.quantity * recipe.throughput }} {% include 'components/item-link.html.twig' with {'item': stack.item } %}
         {% if type == 'buy' %}
-            (<span
+            <span
                 class="{{ stack.item.price.buyPriceStatus }}"
                 data-bs-toggle="tooltip"
-                data-bs-title="Between {{ stack.item.price.lowestBuyPrice }}ea and {{ stack.item.price.highestBuyPrice }}ea in the last week">
+                data-bs-title="Bought {{ stack.item.price.buyVolume|price }} times for prices between {{ stack.item.price.lowestBuyPrice }}ea and {{ stack.item.price.highestBuyPrice }}ea in the last week">
                 {{ stack.item.buyPrice }}ea
-            </span>)
+            </span>
         {% endif %}
         {% if type == 'sell' %}
-            (<span
+            <span
                 class="{{ stack.item.price.sellPriceStatus }}"
                 data-bs-toggle="tooltip"
-                data-bs-title="Between {{ stack.item.price.lowestSellPrice }}ea and {{ stack.item.price.highestSellPrice }}ea in the last week">
+                data-bs-title="Sold {{ stack.item.price.sellVolume|price }} times for prices between {{ stack.item.price.lowestSellPrice }}ea and {{ stack.item.price.highestSellPrice }}ea in the last week">
                 {{ stack.item.sellPrice }}ea
-            </span>)
+            </span>
         {% endif %}
     {% else %}
         {{ (stack.quantity * recipe.throughput)|price(2) }} {{ stack.item.name }} ({{ stack.quantity }}ea)
