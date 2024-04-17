@@ -52,6 +52,7 @@ class UpdatePriceHistoryCommand extends Command
         $itemsToUpdate = array_filter($itemsToUpdate, fn (Item $item) => !$item->isMoney());
 
         $io->info(sprintf('Fetching price history for %s items', count($itemsToUpdate)));
+        $progressBar = $io->createProgressBar(count($itemsToUpdate));
         $updates = 0;
         $skipped = 0;
         foreach ($itemsToUpdate as $item) {
@@ -63,6 +64,7 @@ class UpdatePriceHistoryCommand extends Command
                 $pricesPerTimestamp = $priceData->toArray()['data'] ?? [];
             } catch (Exception | Throwable $exception) {
                 $this->logger->warning('Unable to fetch price history for item', ['itemGameId' => $item->getGameId(), 'exception' => $exception]);
+                $progressBar->advance();
                 $skipped++;
                 continue;
             }
@@ -89,7 +91,8 @@ class UpdatePriceHistoryCommand extends Command
 
             if (count($highPricesForLastWeek) === 0 || count($lowPricesForLastWeek) === 0) {
                 $this->logger->info('No item price history data for last week', ['itemGameId' => $item->getGameId()]);
-                $skipped++;
+                $skipped++;;
+                $progressBar->advance();
                 continue;
             }
 
@@ -104,10 +107,12 @@ class UpdatePriceHistoryCommand extends Command
             $price->setHighVolume(array_sum($highVolumeForLastWeek));
             $price->setLowVolume(array_sum($lowVolumeForLastWeek));
 
-            $updates++;
+            $updates++;;
+            $progressBar->advance();
         }
 
-        $this->itemRepository->save($itemsToUpdate);
+        $this->itemRepository->save($itemsToUpdate);;
+        $progressBar->finish();
 
         $io->success(sprintf('Successfully updated %s historic prices. Skipped %s prices due to errors', $updates, $skipped));
 
